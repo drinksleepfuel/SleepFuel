@@ -1,129 +1,99 @@
-import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
+import {NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
-  header: HeaderQuery;
+  header: HeaderQuery | null;
   publicStoreDomain: string;
 }
 
-export function Footer({
-  footer: footerPromise,
-  header,
-  publicStoreDomain,
-}: FooterProps) {
+const FOOTER_COLUMNS = [
+  {
+    heading: 'Shop',
+    links: [
+      {label: 'SleepFuel Drink Mix', to: '/products/sleepfuel-drink-mix'},
+      {label: 'Subscribe & Save', to: '/products/sleepfuel-drink-mix#subscribe'},
+    ],
+  },
+  {
+    heading: 'Company',
+    links: [
+      {label: 'About', to: '/about'},
+      {label: 'FAQs', to: '/faq'},
+    ],
+  },
+  {
+    heading: 'Support',
+    links: [
+      {label: 'Contact', to: '/contact'},
+      {label: 'Account', to: '/account'},
+    ],
+  },
+];
+
+const FDA_DISCLAIMER = `* These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure or prevent any disease.
+Information on this site is provided for informational purposes only. It is not meant to substitute for medical advice from your physician or other medical professional. You should not use the information contained herein for diagnosing or treating a health problem or disease, or prescribing any medication. Carefully read all product documentation. If you have or suspect that you have a medical problem, promptly contact your regular health care provider.`;
+
+export function Footer(_props: FooterProps) {
   return (
-    <Suspense>
-      <Await resolve={footerPromise}>
-        {(footer) => (
-          <footer className="footer">
-            {footer?.menu && header.shop.primaryDomain?.url && (
-              <FooterMenu
-                menu={footer.menu}
-                primaryDomainUrl={header.shop.primaryDomain.url}
-                publicStoreDomain={publicStoreDomain}
-              />
-            )}
-          </footer>
-        )}
-      </Await>
-    </Suspense>
+    <footer
+      className="mt-auto"
+      style={{background: 'var(--color-midnight)', color: '#fff'}}
+    >
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
+          <div className="col-span-2 md:col-span-1">
+            <div
+              className="text-2xl font-semibold tracking-tight"
+              style={{fontFamily: 'var(--font-display)'}}
+            >
+              SleepFuel<sup className="text-xs">®</sup>
+            </div>
+            <p
+              className="mt-4 max-w-xs text-sm leading-relaxed"
+              style={{color: 'var(--color-jet)'}}
+            >
+              A nightly drink mix engineered for deeper rest and better
+              mornings.
+            </p>
+          </div>
+
+          {FOOTER_COLUMNS.map((col) => (
+            <div key={col.heading}>
+              <h3
+                className="text-sm font-semibold uppercase tracking-wider"
+                style={{color: 'var(--color-awaking)'}}
+              >
+                {col.heading}
+              </h3>
+              <ul className="mt-4 space-y-3">
+                {col.links.map((link) => (
+                  <li key={link.to}>
+                    <NavLink
+                      to={link.to}
+                      prefetch="intent"
+                      className="text-sm transition-opacity hover:opacity-100"
+                      style={{color: 'var(--color-jet)'}}
+                    >
+                      {link.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div
+          className="mt-12 border-t pt-8 text-xs leading-relaxed"
+          style={{borderColor: 'var(--color-recovery)', color: 'var(--color-jet)'}}
+        >
+          <p className="whitespace-pre-line">{FDA_DISCLAIMER}</p>
+          <p className="mt-6 opacity-70">
+            © {new Date().getFullYear()} SleepFuel. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
   );
-}
-
-function FooterMenu({
-  menu,
-  primaryDomainUrl,
-  publicStoreDomain,
-}: {
-  menu: FooterQuery['menu'];
-  primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
-  publicStoreDomain: string;
-}) {
-  return (
-    <nav className="footer-menu" role="navigation">
-      {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
-        if (!item.url) return null;
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        const isExternal = !url.startsWith('/');
-        return isExternal ? (
-          <a href={url} key={item.id} rel="noopener noreferrer" target="_blank">
-            {item.title}
-          </a>
-        ) : (
-          <NavLink
-            end
-            key={item.id}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
-  );
-}
-
-const FALLBACK_FOOTER_MENU = {
-  id: 'gid://shopify/Menu/199655620664',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461633060920',
-      resourceId: 'gid://shopify/ShopPolicy/23358046264',
-      tags: [],
-      title: 'Privacy Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/privacy-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633093688',
-      resourceId: 'gid://shopify/ShopPolicy/23358013496',
-      tags: [],
-      title: 'Refund Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/refund-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633126456',
-      resourceId: 'gid://shopify/ShopPolicy/23358111800',
-      tags: [],
-      title: 'Shipping Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/shipping-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633159224',
-      resourceId: 'gid://shopify/ShopPolicy/23358079032',
-      tags: [],
-      title: 'Terms of Service',
-      type: 'SHOP_POLICY',
-      url: '/policies/terms-of-service',
-      items: [],
-    },
-  ],
-};
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'white',
-  };
 }
