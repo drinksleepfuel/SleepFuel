@@ -58,6 +58,10 @@ export function StickyAddToCart({
               ? 'translate-y-0 opacity-100 pointer-events-auto'
               : 'translate-y-6 opacity-0'
           }`}
+          style={{
+            backdropFilter: 'blur(22px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(22px) saturate(150%)',
+          }}
         >
           {/* Left: thumbnail + name */}
           <div className="flex min-w-0 items-center gap-3">

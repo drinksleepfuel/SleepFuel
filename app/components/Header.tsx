@@ -32,7 +32,11 @@ export function Header({cart, isLoggedIn}: HeaderProps) {
       className={`sticky top-0 z-30 w-full glass border-b border-[color:var(--color-border)] transition-transform duration-300 ease-out ${
         hidden ? '-translate-y-full' : 'translate-y-0'
       }`}
-      style={{height: 'var(--header-height)'}}
+      style={{
+        height: 'var(--header-height)',
+        backdropFilter: 'blur(22px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(22px) saturate(150%)',
+      }}
     >
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <NavLink prefetch="intent" to="/" end className="flex items-center">
