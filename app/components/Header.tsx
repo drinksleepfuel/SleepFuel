@@ -1,4 +1,4 @@
-import {Suspense} from 'react';
+import {Suspense, useEffect, useState} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router';
 import {
   type CartViewPayload,
@@ -26,9 +26,12 @@ const NAV_LINKS = [
 ];
 
 export function Header({cart, isLoggedIn}: HeaderProps) {
+  const hidden = useHideOnScroll();
   return (
     <header
-      className="sticky top-0 z-30 w-full glass border-b border-[color:var(--color-jet)]"
+      className={`sticky top-0 z-30 w-full glass border-b border-[color:var(--color-border)] transition-transform duration-300 ease-out ${
+        hidden ? '-translate-y-full' : 'translate-y-0'
+      }`}
       style={{height: 'var(--header-height)'}}
     >
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -42,6 +45,41 @@ export function Header({cart, isLoggedIn}: HeaderProps) {
       </div>
     </header>
   );
+}
+
+/**
+ * Hides the nav when scrolling down and reveals it when scrolling up
+ * (ouraring.com behavior). Always visible near the top of the page.
+ * The translate lives on the <header> itself, never on an ancestor, so the
+ * backdrop-filter blur keeps working.
+ */
+function useHideOnScroll() {
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+    function update() {
+      const y = window.scrollY;
+      if (y < 80) {
+        setHidden(false);
+      } else if (y > lastY + 4) {
+        setHidden(true);
+      } else if (y < lastY - 4) {
+        setHidden(false);
+      }
+      lastY = y;
+      ticking = false;
+    }
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(update);
+      }
+    }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return hidden;
 }
 
 function Logo() {

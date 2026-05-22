@@ -353,6 +353,7 @@ button.reset > * {
    ------------------------------------------------------------ */
 .btn-pill,
 .btn-primary,
+.btn-blue,
 .btn-gold,
 .btn-outline {
   display: inline-flex;
@@ -362,6 +363,7 @@ button.reset > * {
   border-radius: 9999px;
   padding: 0.75rem 1.5rem;
   font-weight: 500;
+  line-height: 1;
   transition: background-color 200ms, color 200ms, transform 200ms;
   cursor: pointer;
 }
@@ -413,15 +415,18 @@ button.reset > * {
   text-decoration: underline;
 }
 
-/* Frosted cream blur — used by the nav + sticky add-to-cart bar */
+/* Frosted cream blur — used by the nav + sticky add-to-cart bar.
+   IMPORTANT: no ancestor of a .glass element may set transform/translate/
+   filter/opacity<1, or it establishes a "backdrop root" and the blur stops
+   sampling the scrolling page behind it. */
 .glass {
-  background: rgba(246, 243, 239, 0.72);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  background: rgba(246, 243, 239, 0.6);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
 }
 
 .glass-dark {
   background: rgba(38, 34, 32, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }

@@ -46,15 +46,19 @@ export function StickyAddToCart({
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-40 transition-all duration-300 sm:bottom-4 ${
-        visible
-          ? 'translate-y-0 opacity-100'
-          : 'pointer-events-none translate-y-6 opacity-0'
-      }`}
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 sm:bottom-4"
       aria-hidden={!visible}
     >
       <div className="mx-auto w-full px-0 sm:max-w-3xl sm:px-4">
-        <div className="glass flex items-center justify-between gap-3 border-t border-white/40 px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.12)] sm:rounded-2xl sm:border sm:px-4">
+        {/* Reveal animation lives on the .glass element itself — never on an
+            ancestor — so the backdrop-filter keeps sampling the page behind it. */}
+        <div
+          className={`glass flex items-center justify-between gap-3 border-t border-white/30 px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 sm:rounded-full sm:border sm:px-4 ${
+            visible
+              ? 'translate-y-0 opacity-100 pointer-events-auto'
+              : 'translate-y-6 opacity-0'
+          }`}
+        >
           {/* Left: thumbnail + name */}
           <div className="flex min-w-0 items-center gap-3">
             <div
