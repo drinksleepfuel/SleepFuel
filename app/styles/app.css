@@ -118,6 +118,16 @@ h6 {
   color: var(--color-ink);
 }
 
+/* The Hydrogen scaffold reset insets <main> by 1rem and pads every <section>.
+   This design is full-bleed (hero bleeds off the page, footer spans full
+   width) and each section sets its own padding, so neutralize both. */
+body > main {
+  margin: 0;
+}
+section {
+  padding: 0;
+}
+
 /* ------------------------------------------------------------
    Scaffold CSS kept (cart aside drawer, sr-only).
    New page chrome (header, footer, product page) uses Tailwind.

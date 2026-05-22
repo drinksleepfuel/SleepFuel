@@ -86,8 +86,9 @@ function Hero({
     mode === 'subscribe' ? SELLING_PLAN_IDS[packKey] : undefined;
 
   return (
-    <section className="grid items-stretch lg:grid-cols-[1.05fr_1fr]">
-      {/* Left: full-bleed product image (touches the left viewport edge) */}
+    <section className="grid items-stretch overflow-hidden lg:grid-cols-[1.05fr_1fr]">
+      {/* Left: product image — rounded on the visible (right) side, bleeds
+          completely off the left edge of the page. */}
       <div className="relative min-h-[52vh] lg:min-h-[88vh]">
         <HeroVisual />
       </div>
@@ -243,13 +244,13 @@ function Hero({
 function HeroVisual() {
   return (
     <div
-      className="absolute inset-0 h-full w-full overflow-hidden"
+      className="absolute inset-y-0 right-0 left-0 overflow-hidden rounded-b-[1.75rem] lg:-left-16 lg:rounded-b-none lg:rounded-r-[2.75rem]"
       style={{
         background:
           'radial-gradient(120% 90% at 25% 25%, #3a4a6e 0%, #232a3f 45%, #14161f 100%)',
       }}
     >
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center lg:pl-16">
         <div className="text-center text-white/90">
           <div className="text-xs uppercase tracking-[0.4em] text-white/60">
             SleepFuel
