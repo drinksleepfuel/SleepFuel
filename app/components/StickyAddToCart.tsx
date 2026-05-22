@@ -16,9 +16,11 @@ type Props = {
 };
 
 /**
- * Bottom-right sticky add-to-cart. Defaults to 10-pack + subscribe-and-save
- * per the brief. Becomes visible once the user scrolls past the hero so it
- * doesn't fight with the in-page form.
+ * Oura-style sticky add-to-cart bar: a frosted, slightly transparent
+ * rounded bar pinned to the bottom. Product thumbnail + name + variant on
+ * the left; price + blue Add to Cart button on the right. Defaults to the
+ * 10-pack subscribe-and-save per the brief. Reveals after the hero scrolls
+ * out of view.
  */
 export function StickyAddToCart({
   packKey = 'pack10',
@@ -38,61 +40,71 @@ export function StickyAddToCart({
 
   const variant = VARIANTS[packKey];
   const {base, final} = priceFor(packKey, mode);
-  const sellingPlanId = mode === 'subscribe' ? SELLING_PLAN_IDS[packKey] : undefined;
+  const sellingPlanId =
+    mode === 'subscribe' ? SELLING_PLAN_IDS[packKey] : undefined;
   const showStrike = mode === 'subscribe';
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-40 transition-all duration-300 ${
+      className={`fixed inset-x-0 bottom-0 z-40 transition-all duration-300 sm:bottom-4 ${
         visible
           ? 'translate-y-0 opacity-100'
-          : 'pointer-events-none translate-y-4 opacity-0'
+          : 'pointer-events-none translate-y-6 opacity-0'
       }`}
       aria-hidden={!visible}
     >
-      <div
-        className="flex items-center gap-4 rounded-full p-2 pl-5 shadow-2xl"
-        style={{background: 'var(--color-midnight)', color: '#fff'}}
-      >
-        <div className="hidden sm:block">
-          <div className="text-xs uppercase tracking-wider opacity-70">
-            {variant.label} · {mode === 'subscribe' ? 'Subscribe' : 'One-time'}
+      <div className="mx-auto w-full px-0 sm:max-w-3xl sm:px-4">
+        <div className="glass flex items-center justify-between gap-3 border-t border-white/40 px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.12)] sm:rounded-2xl sm:border sm:px-4">
+          {/* Left: thumbnail + name */}
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              className="hidden h-12 w-12 shrink-0 rounded-xl sm:block"
+              style={{
+                background:
+                  'radial-gradient(120% 100% at 30% 25%, #3a4a6e 0%, #232a3f 60%, #14161f 100%)',
+              }}
+              aria-hidden="true"
+            />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold text-[color:var(--color-ink)]">
+                {PRODUCT_NAME}
+              </div>
+              <div className="truncate text-xs text-[color:var(--color-muted)]">
+                {variant.label} ·{' '}
+                {mode === 'subscribe' ? 'Subscribe & Save' : 'One-time'}
+              </div>
+            </div>
           </div>
-          <div className="text-sm font-medium">
-            {showStrike && (
-              <span className="opacity-60 line-through mr-2">
-                {formatPrice(base)}
-              </span>
-            )}
-            <span>{formatPrice(final)}</span>
+
+          {/* Right: price + CTA */}
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="text-right text-sm font-semibold text-[color:var(--color-ink)]">
+              {showStrike && (
+                <span className="mr-1 font-normal text-[color:var(--color-muted)] line-through">
+                  {formatPrice(base)}
+                </span>
+              )}
+              {formatPrice(final)}
+            </div>
+            <AddToCartButton
+              analytics={{type: 'sticky-cta', packKey, mode}}
+              lines={[
+                {
+                  merchandiseId: variant.merchandiseId,
+                  quantity: 1,
+                  ...(sellingPlanId ? {sellingPlanId} : {}),
+                },
+              ]}
+              onClick={() => open('cart')}
+              className="btn-blue px-5 py-2.5 text-sm"
+            >
+              Add to Cart
+            </AddToCartButton>
           </div>
         </div>
-
-        <AddToCartButton
-          analytics={{type: 'sticky-cta', packKey, mode}}
-          lines={[
-            {
-              merchandiseId: variant.merchandiseId,
-              quantity: 1,
-              ...(sellingPlanId ? {sellingPlanId} : {}),
-            },
-          ]}
-          onClick={() => open('cart')}
-        >
-          <span
-            className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold"
-            style={{
-              background: 'var(--color-awaking)',
-              color: 'var(--color-midnight)',
-            }}
-          >
-            Add to cart
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M2 7h10M7 2l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </span>
-        </AddToCartButton>
       </div>
     </div>
   );
 }
+
+const PRODUCT_NAME = 'SleepFuel Drink Mix';

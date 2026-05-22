@@ -23,7 +23,6 @@ type Viewport = 'desktop' | 'mobile';
 const NAV_LINKS = [
   {label: 'Shop', to: '/products/sleepfuel-drink-mix'},
   {label: 'About', to: '/about'},
-  {label: 'FAQs', to: '/faq'},
 ];
 
 export function Header({cart, isLoggedIn}: HeaderProps) {
@@ -95,12 +94,11 @@ function HeaderCtas({
   cart,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
   return (
-    <div className="flex items-center gap-3">
-      <HeaderMenuMobileToggle />
+    <div className="flex items-center gap-1.5 sm:gap-3">
       <NavLink
         prefetch="intent"
         to="/account"
-        className="hidden text-sm font-medium text-[color:var(--color-recovery)] hover:text-[color:var(--color-midnight)] md:block"
+        className="hidden text-sm font-medium text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] md:block"
       >
         <Suspense fallback="Account">
           <Await resolve={isLoggedIn} errorElement="Sign in">
@@ -109,6 +107,7 @@ function HeaderCtas({
         </Suspense>
       </NavLink>
       <CartToggle cart={cart} />
+      <HeaderMenuMobileToggle />
     </div>
   );
 }
@@ -119,11 +118,11 @@ function HeaderMenuMobileToggle() {
     <button
       type="button"
       onClick={() => open('mobile')}
-      className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-[color:var(--color-neutral)]"
+      className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--color-border)] text-[color:var(--color-ink)] hover:bg-white/50"
       aria-label="Open menu"
     >
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M2 5h16v1.5H2zM2 9.25h16v1.5H2zM2 13.5h16V15H2z" />
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M2 5h16v1.6H2zM2 9.2h16v1.6H2zM2 13.4h16V15H2z" />
       </svg>
     </button>
   );
@@ -146,12 +145,12 @@ function CartBadge({count}: {count: number | null}) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium hover:bg-[color:var(--color-neutral)]"
+      className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--color-border)] text-[color:var(--color-ink)] hover:bg-white/50 md:h-10 md:w-auto md:gap-2 md:px-4"
       aria-label={`Open cart (${count ?? 0} items)`}
     >
       <svg
-        width="20"
-        height="20"
+        width="18"
+        height="18"
         viewBox="0 0 20 20"
         fill="none"
         stroke="currentColor"
@@ -165,7 +164,14 @@ function CartBadge({count}: {count: number | null}) {
         <circle cx="8" cy="17" r="1" />
         <circle cx="15" cy="17" r="1" />
       </svg>
-      <span>{count === null ? <>&nbsp;</> : count}</span>
+      <span className="hidden text-sm font-medium md:inline">
+        {count === null ? <>&nbsp;</> : count}
+      </span>
+      {count !== null && count > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[color:var(--color-blue)] px-1 text-[10px] font-semibold text-white md:hidden">
+          {count}
+        </span>
+      )}
     </button>
   );
 }

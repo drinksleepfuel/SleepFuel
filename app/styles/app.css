@@ -51,25 +51,35 @@
 
 /* ============================================================
    SleepFuel Design System
-   Extracted from Figma styleguide
+   Color palette matched to ouraring.com (cream / ink / royal blue).
+   Fonts retained from the SleepFuel Figma styleguide.
    ============================================================ */
 
 @theme {
-  /* Colors — Primary */
-  --color-midnight: #2f3938;
-  --color-midnight-2: #3c4a49;
-  --color-recovery: #4d6160;
+  /* Oura-matched palette */
+  --color-cream: #f6f3ef; /* page background */
+  --color-sand: #e6ded3; /* warm sections / image fallbacks */
+  --color-sand-soft: #efe9df; /* subtle warm tint */
+  --color-border: #e2dbd3; /* hairline borders */
+  --color-ink: #1c1b1a; /* headings + primary text */
+  --color-ink-soft: #2a2825; /* hover on dark */
+  --color-muted: #5f6368; /* secondary text */
+  --color-footer: #262220; /* dark warm footer */
+  --color-blue: #1b4de0; /* CTA */
+  --color-blue-hover: #1740c0;
 
-  /* Colors — Secondary */
-  --color-jet: #dbdbdb;
-  --color-sunset: #655a7e;
-  --color-neutral: #f5f5f5;
-  --color-charcoal: #1a1a1a;
-
-  /* Colors — Accent */
-  --color-golden: #d6ab2d;
-  --color-awaking: #e1ff7c;
-  --color-action: #2a72de;
+  /* Legacy token names remapped to the Oura palette so older
+     components (e.g. About page) stay on-brand. */
+  --color-midnight: #1c1b1a;
+  --color-midnight-2: #2a2825;
+  --color-recovery: #5f6368;
+  --color-jet: #e2dbd3;
+  --color-sunset: #6b6f73;
+  --color-neutral: #f6f3ef;
+  --color-charcoal: #262220;
+  --color-golden: #1b4de0;
+  --color-awaking: #e6ded3;
+  --color-action: #1b4de0;
 
   /* Brand fonts — self-hosted from app/assets/fonts */
   --font-display: 'Tomato Grotesk', system-ui, sans-serif;
@@ -90,8 +100,8 @@
 html,
 body {
   font-family: var(--font-body);
-  color: var(--color-midnight);
-  background: #fff;
+  color: var(--color-ink);
+  background: var(--color-cream);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -104,8 +114,8 @@ h5,
 h6 {
   font-family: var(--font-display);
   font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-midnight);
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
 }
 
 /* ------------------------------------------------------------
@@ -356,31 +366,35 @@ button.reset > * {
   cursor: pointer;
 }
 
-.btn-primary {
-  background: var(--color-midnight);
+/* Primary CTA = Oura royal-blue pill */
+.btn-primary,
+.btn-blue {
+  background: var(--color-blue);
   color: #fff;
   border: 0;
 }
-.btn-primary:hover {
-  background: var(--color-midnight-2);
+.btn-primary:hover,
+.btn-blue:hover {
+  background: var(--color-blue-hover);
 }
 
+/* Dark ink pill (secondary) */
 .btn-gold {
-  background: var(--color-golden);
-  color: var(--color-midnight);
+  background: var(--color-ink);
+  color: #fff;
   border: 0;
 }
 .btn-gold:hover {
-  background: #c19a28;
+  background: var(--color-ink-soft);
 }
 
 .btn-outline {
   background: transparent;
-  border: 2px solid var(--color-midnight);
-  color: var(--color-midnight);
+  border: 1px solid var(--color-ink);
+  color: var(--color-ink);
 }
 .btn-outline:hover {
-  background: var(--color-midnight);
+  background: var(--color-ink);
   color: #fff;
 }
 
@@ -389,7 +403,7 @@ button.reset > * {
   align-items: center;
   gap: 0.25rem;
   font-weight: 500;
-  color: var(--color-midnight);
+  color: var(--color-ink);
   background: transparent;
   border: 0;
   padding: 0;
@@ -399,15 +413,15 @@ button.reset > * {
   text-decoration: underline;
 }
 
-/* Glass-morphism overlay (from styleguide) */
+/* Frosted cream blur — used by the nav + sticky add-to-cart bar */
 .glass {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(246, 243, 239, 0.72);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 .glass-dark {
-  background: rgba(26, 26, 26, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(38, 34, 32, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }

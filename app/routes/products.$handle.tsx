@@ -18,19 +18,11 @@ import {
 export const meta: Route.MetaFunction = () => {
   return [
     {title: 'SleepFuel Drink Mix — Mixed Berry Sleep Supplement'},
-    {
-      name: 'description',
-      content: PRODUCT.tagline,
-    },
+    {name: 'description', content: PRODUCT.tagline},
     {rel: 'canonical', href: `/products/${PRODUCT.handle}`},
   ];
 };
 
-/**
- * Loader is currently a no-op. Once the product exists in Shopify with handle
- * `sleepfuel-drink-mix`, wire the PRODUCT_QUERY back in and merge real
- * variant/sellingPlan IDs into `app/lib/sleepfuelProduct.ts`.
- */
 export async function loader(_args: Route.LoaderArgs) {
   return {};
 }
@@ -41,12 +33,14 @@ export default function ProductPage() {
 
   return (
     <>
-      <Hero packKey={packKey} setPackKey={setPackKey} mode={mode} setMode={setMode} />
-      <BenefitsStrip />
-      <HowItWorks />
-      <Ingredients />
-      <Testimonials />
-      <ScienceCTA />
+      <Hero
+        packKey={packKey}
+        setPackKey={setPackKey}
+        mode={mode}
+        setMode={setMode}
+      />
+      <FeatureCallouts />
+      <FAQSection />
 
       <StickyAddToCart packKey={packKey} mode={mode} />
 
@@ -70,7 +64,7 @@ export default function ProductPage() {
 }
 
 /* ============================================================
-   Hero
+   Hero — product image bleeds off the left edge; buy box right
    ============================================================ */
 
 function Hero({
@@ -88,89 +82,79 @@ function Hero({
   const variant = VARIANTS[packKey];
   const {base, final} = priceFor(packKey, mode);
   const showStrike = mode === 'subscribe';
-  const sellingPlanId = mode === 'subscribe' ? SELLING_PLAN_IDS[packKey] : undefined;
+  const sellingPlanId =
+    mode === 'subscribe' ? SELLING_PLAN_IDS[packKey] : undefined;
 
   return (
-    <section
-      className="relative overflow-hidden"
-      style={{background: 'var(--color-neutral)'}}
-    >
-      <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-24">
-        {/* Product visual */}
-        <div className="order-2 lg:order-1">
-          <ProductVisual />
-        </div>
+    <section className="grid items-stretch lg:grid-cols-[1.05fr_1fr]">
+      {/* Left: full-bleed product image (touches the left viewport edge) */}
+      <div className="relative min-h-[52vh] lg:min-h-[88vh]">
+        <HeroVisual />
+      </div>
 
-        {/* Buy box */}
-        <div className="order-1 flex flex-col gap-6 lg:order-2">
-          <div className="inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider"
-            style={{background: 'var(--color-awaking)', color: 'var(--color-midnight)'}}
-          >
-            New · Doctor-formulated
-          </div>
-
-          <h1
-            className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl"
-            style={{fontFamily: 'var(--font-display)', color: 'var(--color-midnight)'}}
-          >
+      {/* Right: buy box */}
+      <div className="flex items-center px-5 py-12 sm:px-8 lg:px-14 lg:py-20">
+        <div className="mx-auto w-full max-w-md">
+          <p className="text-sm font-medium text-[color:var(--color-muted)]">
+            SleepFuel Drink Mix · Mixed Berry
+          </p>
+          <h1 className="mt-2 text-4xl leading-[1.05] tracking-tight sm:text-5xl">
             {PRODUCT.title}
           </h1>
-
-          <p className="max-w-md text-lg leading-relaxed text-[color:var(--color-recovery)]">
+          <p className="mt-4 text-lg leading-relaxed text-[color:var(--color-muted)]">
             {PRODUCT.tagline}
           </p>
 
           {/* Pack selector */}
-          <fieldset className="grid grid-cols-2 gap-3">
-            <legend className="sr-only">Choose your pack size</legend>
-            {(['pack10', 'pack30'] as PackKey[]).map((k) => {
-              const v = VARIANTS[k];
-              const p = priceFor(k, mode);
-              const selected = packKey === k;
-              const recommended = k === 'pack30';
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  onClick={() => setPackKey(k)}
-                  className={`relative flex flex-col items-start gap-1 rounded-2xl border-2 p-4 text-left transition-all ${
-                    selected
-                      ? 'border-[color:var(--color-midnight)] bg-white'
-                      : 'border-[color:var(--color-jet)] bg-white/60 hover:border-[color:var(--color-recovery)]'
-                  }`}
-                  aria-pressed={selected}
-                >
-                  {recommended && (
-                    <span
-                      className="absolute -top-2 right-3 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-                      style={{
-                        background: 'var(--color-golden)',
-                        color: 'var(--color-midnight)',
-                      }}
-                    >
-                      Best value
-                    </span>
-                  )}
-                  <span className="text-sm font-semibold">{v.label}</span>
-                  <span className="text-xs text-[color:var(--color-recovery)]">
-                    {v.servings} servings · {formatPrice(p.final / v.servings)}/night
-                  </span>
-                  <span className="mt-1 text-lg font-semibold">
-                    {showStrike && (
-                      <span className="mr-1 text-sm font-normal opacity-50 line-through">
-                        {formatPrice(p.base)}
+          <fieldset className="mt-8">
+            <legend className="text-sm font-medium text-[color:var(--color-ink)]">
+              Choose your size
+            </legend>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              {(['pack10', 'pack30'] as PackKey[]).map((k) => {
+                const v = VARIANTS[k];
+                const p = priceFor(k, mode);
+                const selected = packKey === k;
+                const recommended = k === 'pack30';
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setPackKey(k)}
+                    aria-pressed={selected}
+                    className={`relative rounded-2xl border bg-white p-4 text-left transition-all ${
+                      selected
+                        ? 'border-[color:var(--color-ink)] ring-1 ring-[color:var(--color-ink)]'
+                        : 'border-[color:var(--color-border)] hover:border-[color:var(--color-muted)]'
+                    }`}
+                  >
+                    {recommended && (
+                      <span className="absolute -top-2 right-3 rounded-full bg-[color:var(--color-blue)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                        Best value
                       </span>
                     )}
-                    {formatPrice(p.final)}
-                  </span>
-                </button>
-              );
-            })}
+                    <span className="block text-sm font-semibold">
+                      {v.label}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-[color:var(--color-muted)]">
+                      {formatPrice(p.final / v.servings)}/night
+                    </span>
+                    <span className="mt-2 block text-base font-semibold">
+                      {showStrike && (
+                        <span className="mr-1 text-sm font-normal text-[color:var(--color-muted)] line-through">
+                          {formatPrice(p.base)}
+                        </span>
+                      )}
+                      {formatPrice(p.final)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </fieldset>
 
           {/* Purchase mode */}
-          <fieldset className="rounded-2xl border-2 border-[color:var(--color-midnight)] bg-white">
-            <legend className="sr-only">Purchase mode</legend>
+          <fieldset className="mt-4 overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-white">
             <label
               className={`flex cursor-pointer items-start gap-3 p-4 ${
                 mode === 'subscribe' ? '' : 'opacity-70'
@@ -179,30 +163,23 @@ function Hero({
               <input
                 type="radio"
                 name="mode"
-                value="subscribe"
                 checked={mode === 'subscribe'}
                 onChange={() => setMode('subscribe')}
-                className="mt-1"
+                className="mt-1 accent-[color:var(--color-blue)]"
               />
               <span className="flex-1">
                 <span className="flex items-center gap-2">
-                  <strong>Subscribe & Save</strong>
-                  <span
-                    className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-                    style={{
-                      background: 'var(--color-awaking)',
-                      color: 'var(--color-midnight)',
-                    }}
-                  >
+                  <strong className="text-sm">Subscribe &amp; Save</strong>
+                  <span className="rounded-full bg-[color:var(--color-sand)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[color:var(--color-ink)]">
                     Save {Math.round(SUBSCRIBE_DISCOUNT * 100)}%
                   </span>
                 </span>
-                <span className="block text-sm text-[color:var(--color-recovery)]">
-                  Auto-delivered monthly. Cancel anytime.
+                <span className="mt-0.5 block text-sm text-[color:var(--color-muted)]">
+                  Delivered monthly. Cancel anytime.
                 </span>
               </span>
             </label>
-            <div className="border-t border-[color:var(--color-jet)]" />
+            <div className="border-t border-[color:var(--color-border)]" />
             <label
               className={`flex cursor-pointer items-start gap-3 p-4 ${
                 mode === 'onetime' ? '' : 'opacity-70'
@@ -211,14 +188,13 @@ function Hero({
               <input
                 type="radio"
                 name="mode"
-                value="onetime"
                 checked={mode === 'onetime'}
                 onChange={() => setMode('onetime')}
-                className="mt-1"
+                className="mt-1 accent-[color:var(--color-blue)]"
               />
               <span className="flex-1">
-                <strong>One-time purchase</strong>
-                <span className="block text-sm text-[color:var(--color-recovery)]">
+                <strong className="text-sm">One-time purchase</strong>
+                <span className="mt-0.5 block text-sm text-[color:var(--color-muted)]">
                   No subscription. Pay full price.
                 </span>
               </span>
@@ -236,21 +212,25 @@ function Hero({
               },
             ]}
             onClick={() => open('cart')}
-            className="btn-primary w-full text-base"
+            className="btn-blue mt-6 w-full text-base"
           >
-            Add to cart — {showStrike && (
-              <span className="mr-1 opacity-60 line-through">{formatPrice(base)}</span>
-            )}{formatPrice(final)}
+            Add to Cart —{' '}
+            {showStrike && (
+              <span className="ml-1 text-white/60 line-through">
+                {formatPrice(base)}
+              </span>
+            )}{' '}
+            {formatPrice(final)}
           </AddToCartButton>
 
-          <ul className="grid grid-cols-1 gap-2 text-sm text-[color:var(--color-recovery)] sm:grid-cols-3">
-            <li className="flex items-center gap-2">
+          <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[color:var(--color-muted)]">
+            <li className="flex items-center gap-1.5">
               <Check /> Free US shipping
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex items-center gap-1.5">
               <Check /> Cancel anytime
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex items-center gap-1.5">
               <Check /> 100% money-back
             </li>
           </ul>
@@ -260,30 +240,26 @@ function Hero({
   );
 }
 
-function ProductVisual() {
+function HeroVisual() {
   return (
     <div
-      className="relative aspect-square w-full overflow-hidden rounded-3xl"
+      className="absolute inset-0 h-full w-full overflow-hidden"
       style={{
         background:
-          'radial-gradient(circle at 30% 30%, var(--color-sunset) 0%, var(--color-midnight) 60%, var(--color-charcoal) 100%)',
+          'radial-gradient(120% 90% at 25% 25%, #3a4a6e 0%, #232a3f 45%, #14161f 100%)',
       }}
     >
-      <div
-        className="absolute inset-0 flex items-center justify-center text-center"
-        style={{color: 'var(--color-awaking)'}}
-      >
-        <div>
-          <div className="text-sm uppercase tracking-[0.3em] opacity-70">SleepFuel</div>
-          <div
-            className="mt-2 text-5xl font-semibold sm:text-6xl"
-            style={{fontFamily: 'var(--font-display)'}}
-          >
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="text-center text-white/90">
+          <div className="text-xs uppercase tracking-[0.4em] text-white/60">
+            SleepFuel
+          </div>
+          <div className="mt-3 text-6xl leading-none tracking-tight sm:text-7xl">
             Sleep
             <br />
             Mix
           </div>
-          <div className="mt-3 text-sm uppercase tracking-[0.3em] opacity-70">
+          <div className="mt-4 text-xs uppercase tracking-[0.4em] text-white/60">
             Mixed Berry
           </div>
         </div>
@@ -295,8 +271,8 @@ function ProductVisual() {
 function Check() {
   return (
     <svg
-      width="16"
-      height="16"
+      width="15"
+      height="15"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
@@ -309,233 +285,138 @@ function Check() {
 }
 
 /* ============================================================
-   Below the fold sections
+   3 feature callouts with images
    ============================================================ */
 
-function BenefitsStrip() {
+function FeatureCallouts() {
+  const features = [
+    {
+      eyebrow: 'Engineered in every way',
+      title: 'Deep sleep, by design',
+      copy: 'Five evidence-backed actives at clinical doses — magnesium, L-theanine, glycine, B6, and a low, body-clock-friendly dose of melatonin.',
+      gradient:
+        'radial-gradient(120% 100% at 30% 20%, #4a5578 0%, #2a3147 55%, #181b27 100%)',
+    },
+    {
+      eyebrow: 'Mixed berry like you’ve never tasted',
+      title: 'Actually delicious',
+      copy: 'No chalky aftertaste, no sugar crash. One stick into cold or warm water and you’re set for the night.',
+      gradient:
+        'radial-gradient(120% 100% at 70% 30%, #7a4a63 0%, #45283a 55%, #1f1620 100%)',
+    },
+    {
+      eyebrow: 'Made for you and all you do',
+      title: 'Wake up clear',
+      copy: 'Deeper, more restorative sleep with no morning grogginess and no melatonin hangover.',
+      gradient:
+        'radial-gradient(120% 100% at 40% 30%, #4d6160 0%, #2c3a39 55%, #141a19 100%)',
+    },
+  ];
+
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="grid gap-8 md:grid-cols-3">
-        {PRODUCT.benefits.map((b, i) => (
-          <div key={b.title} className="flex flex-col gap-3">
+    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <div className="grid gap-6 md:grid-cols-3">
+        {features.map((f) => (
+          <article key={f.title} className="flex flex-col">
             <div
-              className="inline-flex h-12 w-12 items-center justify-center rounded-full"
-              style={{
-                background:
-                  i === 0
-                    ? 'var(--color-awaking)'
-                    : i === 1
-                    ? 'var(--color-golden)'
-                    : 'var(--color-sunset)',
-                color: i === 2 ? '#fff' : 'var(--color-midnight)',
-              }}
-            >
-              <BenefitIcon i={i} />
-            </div>
-            <h3
-              className="text-2xl font-semibold"
-              style={{fontFamily: 'var(--font-display)'}}
-            >
-              {b.title}
-            </h3>
-            <p className="text-[color:var(--color-recovery)]">{b.copy}</p>
-          </div>
+              className="aspect-[3/4] w-full overflow-hidden rounded-3xl"
+              style={{background: f.gradient}}
+              aria-hidden="true"
+            />
+            <h3 className="mt-6 text-2xl tracking-tight">{f.title}</h3>
+            <p className="mt-1 text-sm font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+              {f.eyebrow}
+            </p>
+            <p className="mt-3 leading-relaxed text-[color:var(--color-ink)]">
+              {f.copy}
+            </p>
+          </article>
         ))}
       </div>
     </section>
   );
 }
 
-function BenefitIcon({i}: {i: number}) {
-  if (i === 0) {
-    return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M20 14.5A9 9 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-  if (i === 1) {
-    return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M3 18l4-6 4 4 6-9 4 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+/* ============================================================
+   6 expandable FAQs (inline, Oura accordion style)
+   ============================================================ */
 
-function HowItWorks() {
-  const steps = [
-    {n: 1, t: 'Mix one stick into water', d: 'Cold or warm. Mixed berry — actually tastes good.'},
-    {n: 2, t: 'Drink 30 min before bed', d: 'Your nervous system starts to settle in under an hour.'},
-    {n: 3, t: 'Wake up clear', d: 'Deeper sleep, no grogginess, no melatonin hangover.'},
-  ];
+const FAQS: Array<{q: string; a: string}> = [
+  {
+    q: 'What’s in SleepFuel?',
+    a: 'Five evidence-backed ingredients: 300mg magnesium glycinate, 200mg L-theanine, 0.5mg melatonin, 3g glycine, and 1.5mg vitamin B6. Mixed-berry natural flavor, no sugar, no artificial colors.',
+  },
+  {
+    q: 'When and how do I take it?',
+    a: 'Mix one stick into cold or warm water about 30 minutes before bed. Make it part of a wind-down ritual — dim lights, no screens, a glass of SleepFuel.',
+  },
+  {
+    q: 'Will I wake up groggy?',
+    a: 'No. Because we use a low melatonin dose and no sedating ingredients, most people report waking up clear and rested rather than knocked out.',
+  },
+  {
+    q: 'Is it safe to take every night?',
+    a: 'SleepFuel is formulated for nightly use and none of the ingredients are habit-forming. As with any supplement, talk to your doctor if you’re pregnant, nursing, or taking medication.',
+  },
+  {
+    q: 'How does Subscribe & Save work?',
+    a: 'Subscribe and save 20% on every order. We ship a fresh box monthly — pause, skip, or cancel anytime from your account in two clicks.',
+  },
+  {
+    q: 'What’s your return policy?',
+    a: 'If SleepFuel isn’t working for you, we’ll refund your first box — no questions asked. Just email support@sleepfuel.com.',
+  },
+];
 
+function FAQSection() {
   return (
-    <section
-      className="py-20"
-      style={{background: 'var(--color-midnight)', color: '#fff'}}
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2
-          className="max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl"
-          style={{fontFamily: 'var(--font-display)'}}
-        >
-          A nightly ritual that actually <span style={{color: 'var(--color-awaking)'}}>works</span>.
-        </h2>
-        <div className="mt-12 grid gap-8 md:grid-cols-3">
-          {steps.map((s) => (
-            <div key={s.n} className="flex flex-col gap-3">
-              <span
-                className="text-sm font-semibold"
-                style={{color: 'var(--color-awaking)'}}
-              >
-                Step {s.n}
-              </span>
-              <h3
-                className="text-2xl font-semibold"
-                style={{fontFamily: 'var(--font-display)'}}
-              >
-                {s.t}
-              </h3>
-              <p style={{color: 'var(--color-jet)'}}>{s.d}</p>
-            </div>
-          ))}
-        </div>
+    <section className="mx-auto max-w-3xl px-5 pb-28 sm:px-6 lg:px-8">
+      <h2 className="text-3xl tracking-tight sm:text-4xl">
+        Frequently asked questions
+      </h2>
+      <div className="mt-8 border-t border-[color:var(--color-border)]">
+        {FAQS.map((faq) => (
+          <FAQItem key={faq.q} faq={faq} />
+        ))}
       </div>
     </section>
   );
 }
 
-function Ingredients() {
+function FAQItem({faq}: {faq: {q: string; a: string}}) {
+  const [open, setOpen] = useState(false);
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
-        <div>
-          <h2
-            className="text-4xl font-semibold leading-tight sm:text-5xl"
-            style={{fontFamily: 'var(--font-display)', color: 'var(--color-midnight)'}}
+    <div className="border-b border-[color:var(--color-border)]">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-6 py-5 text-left"
+      >
+        <span className="text-lg">{faq.q}</span>
+        <span
+          className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[color:var(--color-border)] transition-transform ${
+            open ? 'rotate-45' : ''
+          }`}
+          aria-hidden="true"
+        >
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 14 14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
           >
-            What&rsquo;s in every stick.
-          </h2>
-          <p className="mt-4 max-w-md text-[color:var(--color-recovery)]">
-            Five evidence-backed ingredients at clinically meaningful doses. No mystery proprietary blends. No fillers.
-          </p>
-        </div>
-        <ul className="divide-y divide-[color:var(--color-jet)]">
-          {PRODUCT.ingredients.map((ing) => (
-            <li key={ing.name} className="flex items-start gap-4 py-4">
-              <span
-                className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-                style={{background: 'var(--color-awaking)', color: 'var(--color-midnight)'}}
-              >
-                {ing.dose}
-              </span>
-              <div>
-                <div className="font-semibold">{ing.name}</div>
-                <div className="text-sm text-[color:var(--color-recovery)]">
-                  {ing.benefit}
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-function Testimonials() {
-  const quotes = [
-    {
-      q: 'I&rsquo;m a chronic 3am-waker. Two weeks on SleepFuel and I&rsquo;m sleeping through.',
-      a: 'Maya R.',
-      r: 'Verified subscriber',
-    },
-    {
-      q: 'Doesn&rsquo;t knock me out. I just… fall asleep like a normal person again.',
-      a: 'Jordan K.',
-      r: 'Verified subscriber',
-    },
-    {
-      q: 'The mornings are the real difference. I wake up actually feeling rested.',
-      a: 'Priya S.',
-      r: 'Verified subscriber',
-    },
-  ];
-
-  return (
-    <section
-      className="py-20"
-      style={{background: 'var(--color-neutral)'}}
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2
-          className="text-center text-4xl font-semibold sm:text-5xl"
-          style={{fontFamily: 'var(--font-display)', color: 'var(--color-midnight)'}}
-        >
-          Trusted by 12,000+ dreamers.
-        </h2>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {quotes.map((quote, i) => (
-            <figure
-              key={i}
-              className="flex flex-col gap-4 rounded-2xl bg-white p-6"
-            >
-              <Stars />
-              <blockquote
-                className="text-lg leading-relaxed"
-                style={{color: 'var(--color-midnight)'}}
-                dangerouslySetInnerHTML={{__html: `&ldquo;${quote.q}&rdquo;`}}
-              />
-              <figcaption className="text-sm">
-                <div className="font-semibold">{quote.a}</div>
-                <div className="text-[color:var(--color-recovery)]">{quote.r}</div>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Stars() {
-  return (
-    <div className="flex gap-1" style={{color: 'var(--color-golden)'}}>
-      {Array.from({length: 5}, (_, i) => (
-        <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 1l2.2 4.5L15 6.2l-3.5 3.4.8 4.8L8 12.1 3.7 14.4l.8-4.8L1 6.2l4.8-.7L8 1z" />
-        </svg>
-      ))}
-    </div>
-  );
-}
-
-function ScienceCTA() {
-  return (
-    <section
-      className="py-20"
-      style={{background: 'var(--color-charcoal)', color: '#fff'}}
-    >
-      <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-        <h2
-          className="text-4xl font-semibold leading-tight sm:text-5xl"
-          style={{fontFamily: 'var(--font-display)'}}
-        >
-          Built on the <span style={{color: 'var(--color-awaking)'}}>science of sleep</span>.
-        </h2>
-        <p className="mt-4 text-lg" style={{color: 'var(--color-jet)'}}>
-          Every ingredient is dosed to the level shown in peer-reviewed sleep research — not the homeopathic doses you&rsquo;ll find in most gummies.
+            <path d="M7 1v12M1 7h12" strokeLinecap="round" />
+          </svg>
+        </span>
+      </button>
+      {open && (
+        <p className="max-w-prose pb-5 pr-10 leading-relaxed text-[color:var(--color-muted)]">
+          {faq.a}
         </p>
-        <a href="/about" className="btn-gold mt-8">
-          Read the research
-        </a>
-      </div>
-    </section>
+      )}
+    </div>
   );
 }
