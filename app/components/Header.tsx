@@ -29,8 +29,8 @@ export function Header({cart, isLoggedIn}: HeaderProps) {
   const hidden = useHideOnScroll();
   return (
     <header
-      className={`sticky top-0 z-30 w-full glass border-b border-[color:var(--color-border)] transition-transform duration-300 ease-out ${
-        hidden ? '-translate-y-full' : 'translate-y-0'
+      className={`glass z-30 shadow-sm transition-transform duration-300 ease-out fixed left-3 right-3 top-3 rounded-2xl border border-[color:var(--color-border)] sm:sticky sm:left-0 sm:right-0 sm:top-0 sm:rounded-none sm:border-x-0 sm:border-t-0 sm:border-b sm:shadow-none ${
+        hidden ? 'translate-y-0 sm:-translate-y-full' : 'translate-y-0'
       }`}
       style={{
         height: 'var(--header-height)',

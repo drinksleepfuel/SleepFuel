@@ -4,6 +4,7 @@ import {Analytics} from '@shopify/hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {StickyAddToCart} from '~/components/StickyAddToCart';
 import {useAside} from '~/components/Aside';
+import heroImage from '~/assets/hero.jpg';
 import {
   PRODUCT,
   SELLING_PLAN_IDS,
@@ -243,28 +244,13 @@ function Hero({
 
 function HeroVisual() {
   return (
-    <div
-      className="absolute inset-y-0 right-0 left-0 overflow-hidden rounded-b-[1.75rem] lg:-left-16 lg:rounded-b-none lg:rounded-r-[2.75rem]"
-      style={{
-        background:
-          'radial-gradient(120% 90% at 25% 25%, #3a4a6e 0%, #232a3f 45%, #14161f 100%)',
-      }}
-    >
-      <div className="absolute inset-0 flex items-center justify-center lg:pl-16">
-        <div className="text-center text-white/90">
-          <div className="text-xs uppercase tracking-[0.4em] text-white/60">
-            SleepFuel
-          </div>
-          <div className="mt-3 text-6xl leading-none tracking-tight sm:text-7xl">
-            Sleep
-            <br />
-            Mix
-          </div>
-          <div className="mt-4 text-xs uppercase tracking-[0.4em] text-white/60">
-            Mixed Berry
-          </div>
-        </div>
-      </div>
+    <div className="absolute inset-y-0 right-0 left-0 overflow-hidden rounded-b-[1.75rem] lg:-left-16 lg:rounded-b-none lg:rounded-tr-[2.75rem] lg:rounded-br-[2.75rem]">
+      <img
+        src={heroImage}
+        alt="A woman taking SleepFuel in bed at golden hour"
+        className="h-full w-full object-cover"
+        loading="eager"
+      />
     </div>
   );
 }

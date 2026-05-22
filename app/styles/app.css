@@ -118,14 +118,12 @@ h6 {
   color: var(--color-ink);
 }
 
-/* The Hydrogen scaffold reset insets <main> by 1rem and pads every <section>.
-   This design is full-bleed (hero bleeds off the page, footer spans full
-   width) and each section sets its own padding, so neutralize both. */
+/* The Hydrogen scaffold reset insets <main> by 1rem; this design is
+   full-bleed and each section sets its own padding via Tailwind utilities.
+   (The reset's `section { padding }` rule was removed in reset.css so those
+   utilities aren't overridden by an unlayered element rule.) */
 body > main {
   margin: 0;
-}
-section {
-  padding: 0;
 }
 
 /* ------------------------------------------------------------
