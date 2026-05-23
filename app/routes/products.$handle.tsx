@@ -100,7 +100,7 @@ function Hero({
           <p className="text-sm font-medium text-[color:var(--color-muted)]">
             SleepFuel Drink Mix · Mixed Berry
           </p>
-          <h1 className="mt-2 text-4xl leading-[1.05] tracking-tight sm:text-5xl">
+          <h1 className="mt-2 text-7xl font-normal leading-[1.05] tracking-tight sm:text-8xl">
             {PRODUCT.title}
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-[color:var(--color-muted)]">
