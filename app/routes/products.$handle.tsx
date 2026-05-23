@@ -357,7 +357,7 @@ const FAQS: Array<{q: string; a: string}> = [
 
 function FAQSection() {
   return (
-    <section className="mx-auto max-w-3xl px-5 pb-28 sm:px-6 lg:px-8">
+    <section className="mx-auto w-full max-w-3xl px-5 pb-28 sm:px-6 lg:px-8">
       <h2 className="text-3xl tracking-tight sm:text-4xl">
         Frequently asked questions
       </h2>
@@ -378,7 +378,7 @@ function FAQItem({faq}: {faq: {q: string; a: string}}) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-6 py-5 text-left"
+        className="flex w-full items-center justify-between gap-6 py-5 text-left outline-none focus:outline-none focus-visible:text-[color:var(--color-blue)]"
       >
         <span className="text-lg">{faq.q}</span>
         <span

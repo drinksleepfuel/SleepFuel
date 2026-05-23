@@ -95,35 +95,38 @@
 }
 
 /* ------------------------------------------------------------
-   Base typography
+   Base typography — kept in @layer base so Tailwind text/color
+   utilities (e.g. text-white/55 in the footer) override these
+   defaults. Unlayered rules would otherwise win over layered
+   utilities regardless of specificity.
    ------------------------------------------------------------ */
-html,
-body {
-  font-family: var(--font-body);
-  color: var(--color-ink);
-  background: var(--color-cream);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+@layer base {
+  html,
+  body {
+    font-family: var(--font-body);
+    color: var(--color-ink);
+    background: var(--color-cream);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--color-ink);
-}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
 
-/* The Hydrogen scaffold reset insets <main> by 1rem; this design is
-   full-bleed and each section sets its own padding via Tailwind utilities.
-   (The reset's `section { padding }` rule was removed in reset.css so those
-   utilities aren't overridden by an unlayered element rule.) */
-body > main {
-  margin: 0;
+  /* The Hydrogen scaffold reset insets <main> by 1rem; this design is
+     full-bleed and each section sets its own padding via Tailwind utilities. */
+  body > main {
+    margin: 0;
+  }
 }
 
 /* ------------------------------------------------------------
