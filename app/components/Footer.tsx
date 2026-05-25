@@ -1,5 +1,6 @@
 import {NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
+import logoUrl from '~/assets/logo.png';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -61,12 +62,14 @@ export function Footer(_props: FooterProps) {
         {/* Top row: wordmark + payment chips */}
         <div className="flex flex-col gap-8 border-b border-white/10 pb-12 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-sm">
-            <div
-              className="text-3xl tracking-tight"
-              style={{fontFamily: 'var(--font-display)'}}
-            >
-              SleepFuel<sup className="text-xs align-super">®</sup>
-            </div>
+            <img
+              src={logoUrl}
+              alt="SleepFuel"
+              className="h-8 w-auto"
+              width={1076}
+              height={223}
+              style={{filter: 'brightness(0) invert(1)'}}
+            />
             <h2 className="mt-6 text-2xl leading-snug text-white/90">
               Get sleep tips, science, and offers from SleepFuel
             </h2>

@@ -10,6 +10,7 @@ import type {
   HeaderQuery,
 } from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import logoUrl from '~/assets/logo.png';
 
 interface HeaderProps {
   header: HeaderQuery | null;
@@ -88,15 +89,13 @@ function useHideOnScroll() {
 
 function Logo() {
   return (
-    <span
-      className="text-2xl font-semibold tracking-tight"
-      style={{
-        fontFamily: 'var(--font-display)',
-        color: 'var(--color-midnight)',
-      }}
-    >
-      SleepFuel<sup className="text-xs">®</sup>
-    </span>
+    <img
+      src={logoUrl}
+      alt="SleepFuel"
+      className="h-7 w-auto sm:h-8"
+      width={1076}
+      height={223}
+    />
   );
 }
 
