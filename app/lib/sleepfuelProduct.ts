@@ -9,6 +9,9 @@
 
 export const SUBSCRIBE_DISCOUNT = 0.2; // 20% off when subscribed
 
+/** Order subtotal (USD) required to unlock free shipping. */
+export const FREE_SHIPPING_THRESHOLD = 49;
+
 export type PackKey = 'pack10' | 'pack30';
 export type PurchaseMode = 'subscribe' | 'onetime';
 
@@ -45,6 +48,16 @@ export const VARIANTS: Record<PackKey, Variant> = {
 export const SELLING_PLAN_IDS: Record<PackKey, string> = {
   pack10: 'gid://shopify/SellingPlan/PLACEHOLDER_10PACK_MONTHLY',
   pack30: 'gid://shopify/SellingPlan/PLACEHOLDER_30PACK_MONTHLY',
+};
+
+/**
+ * Reverse lookup from a variant's merchandise GID to its monthly selling plan,
+ * used by the cart drawer's "switch to Subscribe & Save" upsell to convert
+ * one-time lines into subscriptions.
+ */
+export const MERCHANDISE_TO_SELLING_PLAN: Record<string, string> = {
+  [VARIANTS.pack10.merchandiseId]: SELLING_PLAN_IDS.pack10,
+  [VARIANTS.pack30.merchandiseId]: SELLING_PLAN_IDS.pack30,
 };
 
 export function priceFor(key: PackKey, mode: PurchaseMode) {

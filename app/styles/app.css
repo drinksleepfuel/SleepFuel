@@ -127,6 +127,28 @@
   body > main {
     margin: 0;
   }
+
+  /* Scaffold input + link styling (moved out of the unlayered reset.css).
+     Living in @layer base lets Tailwind utilities win — e.g. border-0 on the
+     footer email pill, or text-white on the mobile-menu links — while
+     unstyled scaffold elements keep these defaults. */
+  input {
+    border-radius: 4px;
+    border: 1px solid #000;
+    font-size: 1rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
 }
 
 /* ------------------------------------------------------------
@@ -158,6 +180,12 @@
   html:has(.overlay.expanded) {
     overflow: hidden;
   }
+}
+
+/* The cart drawer and mobile menu lock page scroll on every viewport. */
+html:has(.sf-cart-overlay.is-open),
+html:has(.sf-mobile-overlay.is-open) {
+  overflow: hidden;
 }
 
 aside {
@@ -238,6 +266,99 @@ aside main {
 
 .overlay.expanded aside {
   transform: translateX(calc(var(--aside-width) * -1));
+}
+
+/* ============================================================
+   Cart drawer — Seed-style floating popup
+   A rounded white card that floats inset from the edges over a dark
+   scrim, sliding in from the right.
+   ============================================================ */
+.sf-cart-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 320ms ease,
+    visibility 0s linear 320ms;
+}
+.sf-cart-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 320ms ease;
+}
+.sf-cart-scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  cursor: default;
+  background: rgba(20, 18, 16, 0.5);
+}
+.sf-cart-panel {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  width: min(27rem, calc(100vw - 1.5rem));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
+  transform: translateX(calc(100% + 1.5rem));
+  transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sf-cart-overlay.is-open .sf-cart-panel {
+  transform: translateX(0);
+}
+
+/* ============================================================
+   Mobile menu — Oura-style unified blurred sheet
+   Full-screen frosted overlay holding the nav and cart together.
+   The blur is applied inline in the component (so the minifier keeps
+   it); NO transform/opacity may sit on the blur layer or its
+   ancestors or the backdrop-filter stops sampling the page.
+   ============================================================ */
+.sf-mobile-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  visibility: hidden;
+  pointer-events: none;
+}
+.sf-mobile-overlay.is-open {
+  visibility: visible;
+  pointer-events: auto;
+}
+.sf-mobile-blur {
+  position: absolute;
+  inset: 0;
+  background: rgba(28, 27, 26, 0);
+  transition: background-color 300ms ease;
+}
+.sf-mobile-overlay.is-open .sf-mobile-blur {
+  background: rgba(24, 22, 21, 0.8);
+}
+.sf-mobile-content {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 300ms ease 40ms,
+    transform 300ms ease 40ms;
+}
+.sf-mobile-overlay.is-open .sf-mobile-content {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 button.reset {

@@ -21,7 +21,7 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
-const NAV_LINKS = [
+export const NAV_LINKS = [
   {label: 'Shop', to: '/products/sleepfuel-drink-mix'},
   {label: 'About', to: '/about'},
 ];

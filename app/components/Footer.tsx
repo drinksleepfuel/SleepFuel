@@ -71,7 +71,7 @@ export function Footer(_props: FooterProps) {
               style={{filter: 'brightness(0) invert(1)'}}
             />
             <h2 className="mt-6 text-2xl leading-snug text-white/90">
-              Get sleep tips, science, and offers from SleepFuel
+              Get sleep tips, science, offers, and 15% off your first order.
             </h2>
             <form
               className="mt-5 flex max-w-sm items-center gap-2 rounded-full border border-white/20 bg-white/5 px-2 py-1.5"
@@ -81,7 +81,7 @@ export function Footer(_props: FooterProps) {
                 type="email"
                 placeholder="Email address"
                 aria-label="Email address"
-                className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none"
+                className="m-0 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-0"
               />
               <button
                 type="submit"
