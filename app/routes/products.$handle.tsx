@@ -7,6 +7,7 @@ import {useAside} from '~/components/Aside';
 import heroImage from '~/assets/hero.jpg';
 import featureCounterImage from '~/assets/feature-counter.jpg';
 import featureBerriesImage from '~/assets/feature-berries.jpg';
+import featureWakeImage from '~/assets/feature-wake.jpg';
 import {
   PRODUCT,
   SELLING_PLAN_IDS,
@@ -301,8 +302,8 @@ function FeatureCallouts() {
       eyebrow: 'Made for you and all you do',
       title: 'Wake up clear',
       copy: 'Deeper, more restorative sleep with no morning grogginess and no melatonin hangover.',
-      image: null,
-      alt: '',
+      image: featureWakeImage,
+      alt: 'A woman waking up rested in lavender pajamas beside a glass of water',
       gradient:
         'radial-gradient(120% 100% at 40% 30%, #4d6160 0%, #2c3a39 55%, #141a19 100%)',
     },
