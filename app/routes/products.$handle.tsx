@@ -5,6 +5,8 @@ import {AddToCartButton} from '~/components/AddToCartButton';
 import {StickyAddToCart} from '~/components/StickyAddToCart';
 import {useAside} from '~/components/Aside';
 import heroImage from '~/assets/hero.jpg';
+import featureCounterImage from '~/assets/feature-counter.jpg';
+import featureBerriesImage from '~/assets/feature-berries.jpg';
 import {
   PRODUCT,
   SELLING_PLAN_IDS,
@@ -281,6 +283,8 @@ function FeatureCallouts() {
       eyebrow: 'Engineered in every way',
       title: 'Deep sleep, by design',
       copy: 'Five evidence-backed actives at clinical doses — magnesium, L-theanine, glycine, B6, and a low, body-clock-friendly dose of melatonin.',
+      image: featureCounterImage,
+      alt: 'SleepFuel mixed berry drink mix sticks on a marble counter',
       gradient:
         'radial-gradient(120% 100% at 30% 20%, #4a5578 0%, #2a3147 55%, #181b27 100%)',
     },
@@ -288,6 +292,8 @@ function FeatureCallouts() {
       eyebrow: 'Mixed berry like you’ve never tasted',
       title: 'Actually delicious',
       copy: 'No chalky aftertaste, no sugar crash. One stick into cold or warm water and you’re set for the night.',
+      image: featureBerriesImage,
+      alt: 'A SleepFuel drink mix stick resting on a bowl of fresh mixed berries',
       gradient:
         'radial-gradient(120% 100% at 70% 30%, #7a4a63 0%, #45283a 55%, #1f1620 100%)',
     },
@@ -295,6 +301,8 @@ function FeatureCallouts() {
       eyebrow: 'Made for you and all you do',
       title: 'Wake up clear',
       copy: 'Deeper, more restorative sleep with no morning grogginess and no melatonin hangover.',
+      image: null,
+      alt: '',
       gradient:
         'radial-gradient(120% 100% at 40% 30%, #4d6160 0%, #2c3a39 55%, #141a19 100%)',
     },
@@ -307,9 +315,17 @@ function FeatureCallouts() {
           <article key={f.title} className="flex flex-col">
             <div
               className="aspect-[3/4] w-full overflow-hidden rounded-3xl"
-              style={{background: f.gradient}}
-              aria-hidden="true"
-            />
+              style={f.image ? undefined : {background: f.gradient}}
+            >
+              {f.image ? (
+                <img
+                  src={f.image}
+                  alt={f.alt}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              ) : null}
+            </div>
             <h3 className="mt-6 text-2xl tracking-tight">{f.title}</h3>
             <p className="mt-1 text-sm font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
               {f.eyebrow}
