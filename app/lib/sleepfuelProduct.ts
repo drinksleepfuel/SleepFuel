@@ -5,11 +5,10 @@
  * `merchandiseId` holds the real Storefront API ProductVariant GID, so
  * one-time add-to-cart works end-to-end.
  *
- * Subscribe & Save: no Shopify Subscriptions selling plans exist yet, so
- * `SELLING_PLAN_IDS` are blank and subscribe mode currently adds a one-time
- * line (see `sellingPlanFor`). Once you create a monthly selling plan for each
- * product in the Shopify admin, paste its SellingPlan GID here and the 20%
- * subscribe discount becomes real at checkout — no other code changes needed.
+ * Subscribe & Save: each product has a recurring "Subscribe and save" selling
+ * plan (20% off) configured in the Shopify admin, wired up in
+ * `SELLING_PLAN_IDS`. Subscribe mode attaches the plan so the discount is
+ * honored at checkout (see `sellingPlanFor`).
  */
 
 export const SUBSCRIBE_DISCOUNT = 0.2; // 20% off when subscribed
@@ -65,9 +64,9 @@ export const BEST_VALUE_KEY: PackKey = 'pack20';
  *   pack10: 'gid://shopify/SellingPlan/123456789',
  */
 export const SELLING_PLAN_IDS: Record<PackKey, string> = {
-  pack10: '',
-  pack20: '',
-  pack30: '',
+  pack10: 'gid://shopify/SellingPlan/2664038486',
+  pack20: 'gid://shopify/SellingPlan/2664071254',
+  pack30: 'gid://shopify/SellingPlan/2663972950',
 };
 
 /** Returns the selling plan GID for a tier, or undefined if not configured. */
@@ -111,7 +110,7 @@ export const PRODUCT = {
   ingredients: [
     {
       name: 'Magnesium Glycinate',
-      dose: '300mg',
+      dose: '200mg',
       benefit: 'Relaxes muscles and the nervous system',
     },
     {
@@ -120,19 +119,24 @@ export const PRODUCT = {
       benefit: 'Calms an overactive mind without sedation',
     },
     {
+      name: 'GABA',
+      dose: '200mg',
+      benefit: 'The brain’s primary calming neurotransmitter',
+    },
+    {
+      name: 'Inositol',
+      dose: '200mg',
+      benefit: 'Supports a balanced mood for easier rest',
+    },
+    {
+      name: 'Lemon Balm Extract',
+      dose: '100mg',
+      benefit: 'A time-honored calming herb',
+    },
+    {
       name: 'Melatonin',
-      dose: '0.5mg',
-      benefit: 'A low, body-clock-respectful dose to signal sleep',
-    },
-    {
-      name: 'Glycine',
-      dose: '3g',
-      benefit: 'Drops core body temperature for deeper sleep',
-    },
-    {
-      name: 'Vitamin B6',
-      dose: '1.5mg',
-      benefit: 'Cofactor for melatonin and serotonin production',
+      dose: '2mg',
+      benefit: 'A micro-dose to gently cue your body clock',
     },
   ],
   benefits: [

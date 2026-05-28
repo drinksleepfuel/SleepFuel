@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, type ReactElement} from 'react';
 import type {Route} from './+types/products.$handle';
 import {Analytics} from '@shopify/hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
@@ -8,6 +8,7 @@ import heroImage from '~/assets/hero.jpg';
 import featureCounterImage from '~/assets/feature-counter.jpg';
 import featureBerriesImage from '~/assets/feature-berries.jpg';
 import featureWakeImage from '~/assets/feature-wake.jpg';
+import formulaPlaceholder from '~/assets/formula-placeholder.svg';
 import {
   BEST_VALUE_KEY,
   PACK_ORDER,
@@ -46,6 +47,7 @@ export default function ProductPage() {
         setMode={setMode}
       />
       <FeatureCallouts />
+      <FormulaScience />
       <FAQSection />
 
       <StickyAddToCart packKey={packKey} mode={mode} />
@@ -285,7 +287,7 @@ function FeatureCallouts() {
     {
       eyebrow: 'Engineered in every way',
       title: 'Deep sleep, by design',
-      copy: 'Five evidence-backed actives at clinical doses — magnesium, L-theanine, glycine, B6, and a low, body-clock-friendly dose of melatonin.',
+      copy: 'Six evidence-backed actives — magnesium glycinate, L-theanine, GABA, inositol, lemon balm, and a micro-dose of melatonin.',
       image: featureCounterImage,
       alt: 'SleepFuel mixed berry drink mix sticks on a marble counter',
       gradient:
@@ -344,13 +346,201 @@ function FeatureCallouts() {
 }
 
 /* ============================================================
+   Ingredient science — synergistic formula, Oura-style icon grid
+   ============================================================ */
+
+type IngredientIcon = (props: {className?: string}) => ReactElement;
+
+function Glyph({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactElement | ReactElement[];
+}) {
+  return (
+    <svg
+      className={className}
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+const CrystalIcon: IngredientIcon = ({className}) => (
+  <Glyph className={className}>
+    <path d="M3.5 8 L7 4 H17 L20.5 8 L12 20.5 Z" />
+    <path d="M3.5 8 H20.5" />
+    <path d="M9.5 8 L12 20.5 L14.5 8" />
+    <path d="M7 4 L9.5 8 M17 4 L14.5 8" />
+  </Glyph>
+);
+
+const TeaCupIcon: IngredientIcon = ({className}) => (
+  <Glyph className={className}>
+    <path d="M5 9.5 H16 V12 A5.5 5.5 0 0 1 5 12 Z" />
+    <path d="M16 10 H18.5 A2 2 0 0 1 18.5 14 H17.5" />
+    <path d="M4.5 20.5 H16.5" />
+    <path d="M8 3 C 9 4.5, 7 5.5, 8 7" />
+    <path d="M12 3 C 13 4.5, 11 5.5, 12 7" />
+  </Glyph>
+);
+
+const MindIcon: IngredientIcon = ({className}) => (
+  <Glyph className={className}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="6" />
+    <path d="M6.5 13 L8 8.5 L9.5 15 L11 11 H17.5" />
+  </Glyph>
+);
+
+const MoleculeIcon: IngredientIcon = ({className}) => (
+  <Glyph className={className}>
+    <path d="M16 5.1 L20 12 L16 18.9 L8 18.9 L4 12 L8 5.1 Z" />
+    <circle cx="16" cy="5.1" r="1.3" fill="currentColor" stroke="none" />
+    <circle cx="20" cy="12" r="1.3" fill="currentColor" stroke="none" />
+    <circle cx="16" cy="18.9" r="1.3" fill="currentColor" stroke="none" />
+    <circle cx="8" cy="18.9" r="1.3" fill="currentColor" stroke="none" />
+    <circle cx="4" cy="12" r="1.3" fill="currentColor" stroke="none" />
+    <circle cx="8" cy="5.1" r="1.3" fill="currentColor" stroke="none" />
+  </Glyph>
+);
+
+const LeafIcon: IngredientIcon = ({className}) => (
+  <Glyph className={className}>
+    <path d="M4 20 C 4 12, 12 4, 20 4 C 20 12, 12 20, 4 20 Z" />
+    <path d="M4 20 C 9 15, 14 10, 20 4" />
+    <path d="M8.5 11.5 L11 13.5 M11.5 8 L14 10" />
+  </Glyph>
+);
+
+const MoonIcon: IngredientIcon = ({className}) => (
+  <Glyph className={className}>
+    <path d="M20.5 14 A8.5 8.5 0 1 1 10 3.5 A6.6 6.6 0 0 0 20.5 14 Z" />
+    <path d="M18 4 l.7 1.6 1.6 .7 -1.6 .7 -.7 1.6 -.7 -1.6 -1.6 -.7 1.6 -.7 Z" />
+  </Glyph>
+);
+
+const INGREDIENTS: Array<{
+  name: string;
+  dose: string;
+  benefit: string;
+  Icon: IngredientIcon;
+}> = [
+  {
+    name: 'Magnesium Glycinate',
+    dose: '200 mg · 48% DV',
+    benefit:
+      'Relaxes tight muscles and settles the nervous system as you wind down.',
+    Icon: CrystalIcon,
+  },
+  {
+    name: 'L-Theanine',
+    dose: '200 mg',
+    benefit:
+      'A calming amino acid from tea that quiets a racing mind without sedation.',
+    Icon: TeaCupIcon,
+  },
+  {
+    name: 'GABA',
+    dose: '200 mg',
+    benefit:
+      'The brain’s primary calming neurotransmitter — dials down mental chatter.',
+    Icon: MindIcon,
+  },
+  {
+    name: 'Inositol',
+    dose: '200 mg',
+    benefit:
+      'Supports a balanced mood so the mind can let go and ease toward rest.',
+    Icon: MoleculeIcon,
+  },
+  {
+    name: 'Lemon Balm Extract',
+    dose: '100 mg · leaf',
+    benefit:
+      'A time-honored calming herb that softens tension and restlessness.',
+    Icon: LeafIcon,
+  },
+  {
+    name: 'Melatonin',
+    dose: '2 mg · micro-dose',
+    benefit:
+      'A micro-dose that gently cues your body clock for sleep — no morning grogginess.',
+    Icon: MoonIcon,
+  },
+];
+
+function FormulaScience() {
+  return (
+    <section className="bg-[color:var(--color-cream)]">
+      <div className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <h2 className="max-w-4xl text-5xl font-normal leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+          Synergistic Ingredients.{' '}
+          <span className="text-[color:var(--color-muted)]">Better Sleep.</span>
+        </h2>
+
+        <div className="mt-12 grid items-start gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-16">
+          {/* Left: image container */}
+          <div className="overflow-hidden rounded-3xl">
+            <img
+              src={formulaPlaceholder}
+              alt="SleepFuel formula — image placeholder"
+              className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Right: intro + ingredient grid */}
+          <div>
+            <p className="max-w-xl text-lg leading-relaxed text-[color:var(--color-muted)] sm:text-xl">
+              Six evidence-backed ingredients work in synergy — calming the mind,
+              relaxing the body, and gently cueing your natural sleep rhythm.
+              Together they help you drift off faster and sleep deeper, with no
+              grogginess and nothing habit-forming.
+            </p>
+
+            <dl className="mt-10 grid gap-x-8 gap-y-9 sm:grid-cols-2">
+              {INGREDIENTS.map(({name, dose, benefit, Icon}) => (
+                <div key={name} className="flex gap-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#eae3da] text-[color:var(--color-ink)]">
+                    <Icon className="h-[22px] w-[22px]" />
+                  </span>
+                  <div>
+                    <dt className="font-medium leading-tight">{name}</dt>
+                    <p className="mt-0.5 text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+                      {dose}
+                    </p>
+                    <dd className="mt-1.5 text-sm leading-relaxed text-[color:var(--color-muted)]">
+                      {benefit}
+                    </dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
    6 expandable FAQs (inline, Oura accordion style)
    ============================================================ */
 
 const FAQS: Array<{q: string; a: string}> = [
   {
     q: 'What’s in SleepFuel?',
-    a: 'Five evidence-backed ingredients: 300mg magnesium glycinate, 200mg L-theanine, 0.5mg melatonin, 3g glycine, and 1.5mg vitamin B6. Mixed-berry natural flavor, no sugar, no artificial colors.',
+    a: 'Six evidence-backed ingredients: 200mg magnesium glycinate, 200mg L-theanine, 200mg GABA, 200mg inositol, 100mg lemon balm extract, and a 2mg micro-dose of melatonin. Mixed-berry natural flavor, no sugar, no artificial colors.',
   },
   {
     q: 'When and how do I take it?',
