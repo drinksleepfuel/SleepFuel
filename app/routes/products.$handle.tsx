@@ -499,16 +499,9 @@ function FormulaScience() {
             />
           </div>
 
-          {/* Right: intro + ingredient grid */}
+          {/* Right: ingredient grid */}
           <div>
-            <p className="max-w-xl text-lg leading-relaxed text-[color:var(--color-muted)] sm:text-xl">
-              Six evidence-backed ingredients work in synergy — calming the mind,
-              relaxing the body, and gently cueing your natural sleep rhythm.
-              Together they help you drift off faster and sleep deeper, with no
-              grogginess and nothing habit-forming.
-            </p>
-
-            <dl className="mt-10 grid gap-x-8 gap-y-9 sm:grid-cols-2">
+            <dl className="grid gap-x-8 gap-y-9 sm:grid-cols-2">
               {INGREDIENTS.map(({name, dose, benefit, Icon}) => (
                 <div key={name} className="flex gap-4">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#eae3da] text-[color:var(--color-ink)]">
