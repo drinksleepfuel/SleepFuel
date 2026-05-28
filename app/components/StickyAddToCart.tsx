@@ -2,10 +2,10 @@ import {useEffect, useState} from 'react';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {
-  SELLING_PLAN_IDS,
   VARIANTS,
   formatPrice,
   priceFor,
+  sellingPlanFor,
   type PackKey,
   type PurchaseMode,
 } from '~/lib/sleepfuelProduct';
@@ -41,7 +41,7 @@ export function StickyAddToCart({
   const variant = VARIANTS[packKey];
   const {base, final} = priceFor(packKey, mode);
   const sellingPlanId =
-    mode === 'subscribe' ? SELLING_PLAN_IDS[packKey] : undefined;
+    mode === 'subscribe' ? sellingPlanFor(packKey) : undefined;
   const showStrike = mode === 'subscribe';
 
   return (

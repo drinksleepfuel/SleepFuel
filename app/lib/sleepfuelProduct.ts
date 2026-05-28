@@ -1,10 +1,15 @@
 /**
- * Placeholder product data for SleepFuel Drink Mix.
+ * SleepFuel product data — linked to the live Shopify products.
  *
- * Replace `merchandiseId` and `sellingPlanId` with real Storefront API GIDs
- * once the product + Shopify Subscriptions selling plan are created in
- * the Shopify admin. Until then, the UI renders against these values so
- * the design can be reviewed without a backend dependency.
+ * Each "tier" is a separate Shopify product (a quantity/night-supply variant).
+ * `merchandiseId` holds the real Storefront API ProductVariant GID, so
+ * one-time add-to-cart works end-to-end.
+ *
+ * Subscribe & Save: no Shopify Subscriptions selling plans exist yet, so
+ * `SELLING_PLAN_IDS` are blank and subscribe mode currently adds a one-time
+ * line (see `sellingPlanFor`). Once you create a monthly selling plan for each
+ * product in the Shopify admin, paste its SellingPlan GID here and the 20%
+ * subscribe discount becomes real at checkout — no other code changes needed.
  */
 
 export const SUBSCRIBE_DISCOUNT = 0.2; // 20% off when subscribed
@@ -12,58 +17,84 @@ export const SUBSCRIBE_DISCOUNT = 0.2; // 20% off when subscribed
 /** Order subtotal (USD) required to unlock free shipping. */
 export const FREE_SHIPPING_THRESHOLD = 49;
 
-export type PackKey = 'pack10' | 'pack30';
+export type PackKey = 'pack10' | 'pack20' | 'pack30';
 export type PurchaseMode = 'subscribe' | 'onetime';
 
 export type Variant = {
   key: PackKey;
-  label: string; // "10 Pack" / "30 Pack"
-  servings: number;
+  label: string; // "10 Night Supply"
+  servings: number; // nights
   basePrice: number; // one-time price, in dollars
-  /** Replace with real Storefront API variant GID */
+  /** Real Storefront API ProductVariant GID */
   merchandiseId: string;
 };
 
 export const VARIANTS: Record<PackKey, Variant> = {
   pack10: {
     key: 'pack10',
-    label: '10 Pack',
+    label: '10 Night Supply',
     servings: 10,
-    basePrice: 29.95,
-    merchandiseId: 'gid://shopify/ProductVariant/PLACEHOLDER_10PACK',
+    basePrice: 29.99,
+    merchandiseId: 'gid://shopify/ProductVariant/44790724296790',
+  },
+  pack20: {
+    key: 'pack20',
+    label: '20 Night Supply',
+    servings: 20,
+    basePrice: 55.99,
+    merchandiseId: 'gid://shopify/ProductVariant/44790725345366',
   },
   pack30: {
     key: 'pack30',
-    label: '30 Pack',
+    label: '30 Night Supply',
     servings: 30,
-    basePrice: 79.95,
-    merchandiseId: 'gid://shopify/ProductVariant/PLACEHOLDER_30PACK',
+    basePrice: 85.99,
+    merchandiseId: 'gid://shopify/ProductVariant/44790725443670',
   },
 };
 
+/** Order of the tiers as shown in the selector. */
+export const PACK_ORDER: PackKey[] = ['pack10', 'pack20', 'pack30'];
+
+/** Tier to highlight with a "Best value" badge (lowest cost per night). */
+export const BEST_VALUE_KEY: PackKey = 'pack20';
+
 /**
- * Selling plan IDs from Shopify Subscriptions. Replace once selling plans
- * are created. One per variant.
+ * Shopify Subscriptions selling plan GIDs — one per product. Empty until the
+ * selling plans are created in the Shopify admin. Fill in like:
+ *   pack10: 'gid://shopify/SellingPlan/123456789',
  */
 export const SELLING_PLAN_IDS: Record<PackKey, string> = {
-  pack10: 'gid://shopify/SellingPlan/PLACEHOLDER_10PACK_MONTHLY',
-  pack30: 'gid://shopify/SellingPlan/PLACEHOLDER_30PACK_MONTHLY',
+  pack10: '',
+  pack20: '',
+  pack30: '',
 };
+
+/** Returns the selling plan GID for a tier, or undefined if not configured. */
+export function sellingPlanFor(key: PackKey): string | undefined {
+  const id = SELLING_PLAN_IDS[key];
+  return id.startsWith('gid://shopify/SellingPlan/') ? id : undefined;
+}
 
 /**
  * Reverse lookup from a variant's merchandise GID to its monthly selling plan,
- * used by the cart drawer's "switch to Subscribe & Save" upsell to convert
- * one-time lines into subscriptions.
+ * used by the cart drawer's "switch to Subscribe & Save" upsell. Only includes
+ * tiers that actually have a configured selling plan.
  */
-export const MERCHANDISE_TO_SELLING_PLAN: Record<string, string> = {
-  [VARIANTS.pack10.merchandiseId]: SELLING_PLAN_IDS.pack10,
-  [VARIANTS.pack30.merchandiseId]: SELLING_PLAN_IDS.pack30,
-};
+export const MERCHANDISE_TO_SELLING_PLAN: Record<string, string> =
+  Object.fromEntries(
+    PACK_ORDER.map((k) => [VARIANTS[k].merchandiseId, sellingPlanFor(k)] as const)
+      .filter((entry): entry is [string, string] => Boolean(entry[1])),
+  );
 
 export function priceFor(key: PackKey, mode: PurchaseMode) {
   const base = VARIANTS[key].basePrice;
   const final = mode === 'subscribe' ? base * (1 - SUBSCRIBE_DISCOUNT) : base;
   return {base, final};
+}
+
+export function pricePerNight(key: PackKey, mode: PurchaseMode) {
+  return priceFor(key, mode).final / VARIANTS[key].servings;
 }
 
 export function formatPrice(n: number) {
@@ -73,7 +104,8 @@ export function formatPrice(n: number) {
 export const PRODUCT = {
   handle: 'sleepfuel-drink-mix',
   title: 'SleepFuel Drink Mix',
-  tagline: 'Mixed berry sleep supplement, powered by Magnesium, L-theanine and Melatonin.',
+  tagline:
+    'Mixed berry sleep supplement, powered by Magnesium, L-theanine and Melatonin.',
   longDescription:
     'A doctor-formulated nightly drink mix that quiets a busy mind, eases you into deep sleep, and helps you wake up clear-headed. Mixed berry flavor, no sugar crash, no morning grogginess.',
   ingredients: [

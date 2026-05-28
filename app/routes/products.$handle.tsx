@@ -9,12 +9,14 @@ import featureCounterImage from '~/assets/feature-counter.jpg';
 import featureBerriesImage from '~/assets/feature-berries.jpg';
 import featureWakeImage from '~/assets/feature-wake.jpg';
 import {
+  BEST_VALUE_KEY,
+  PACK_ORDER,
   PRODUCT,
-  SELLING_PLAN_IDS,
   SUBSCRIBE_DISCOUNT,
   VARIANTS,
   formatPrice,
   priceFor,
+  sellingPlanFor,
   type PackKey,
   type PurchaseMode,
 } from '~/lib/sleepfuelProduct';
@@ -87,7 +89,7 @@ function Hero({
   const {base, final} = priceFor(packKey, mode);
   const showStrike = mode === 'subscribe';
   const sellingPlanId =
-    mode === 'subscribe' ? SELLING_PLAN_IDS[packKey] : undefined;
+    mode === 'subscribe' ? sellingPlanFor(packKey) : undefined;
 
   return (
     <section className="grid items-stretch overflow-hidden lg:grid-cols-[1.05fr_1fr]">
@@ -115,38 +117,38 @@ function Hero({
             <legend className="text-sm font-medium text-[color:var(--color-ink)]">
               Choose your size
             </legend>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              {(['pack10', 'pack30'] as PackKey[]).map((k) => {
+            <div className="mt-3 grid grid-cols-3 gap-2.5">
+              {PACK_ORDER.map((k) => {
                 const v = VARIANTS[k];
                 const p = priceFor(k, mode);
                 const selected = packKey === k;
-                const recommended = k === 'pack30';
+                const recommended = k === BEST_VALUE_KEY;
                 return (
                   <button
                     key={k}
                     type="button"
                     onClick={() => setPackKey(k)}
                     aria-pressed={selected}
-                    className={`relative rounded-2xl border bg-white p-4 text-left transition-all ${
+                    className={`relative rounded-2xl border bg-white p-3 text-left transition-all ${
                       selected
                         ? 'border-[color:var(--color-ink)] ring-1 ring-[color:var(--color-ink)]'
                         : 'border-[color:var(--color-border)] hover:border-[color:var(--color-muted)]'
                     }`}
                   >
                     {recommended && (
-                      <span className="absolute -top-2 right-3 rounded-full bg-[color:var(--color-blue)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[color:var(--color-blue)] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white">
                         Best value
                       </span>
                     )}
                     <span className="block text-sm font-semibold">
-                      {v.label}
+                      {v.servings} Nights
                     </span>
-                    <span className="mt-0.5 block text-xs text-[color:var(--color-muted)]">
+                    <span className="mt-0.5 block text-[11px] text-[color:var(--color-muted)]">
                       {formatPrice(p.final / v.servings)}/night
                     </span>
-                    <span className="mt-2 block text-base font-semibold">
+                    <span className="mt-2 block text-sm font-semibold leading-tight">
                       {showStrike && (
-                        <span className="mr-1 text-sm font-normal text-[color:var(--color-muted)] line-through">
+                        <span className="block text-[11px] font-normal text-[color:var(--color-muted)] line-through">
                           {formatPrice(p.base)}
                         </span>
                       )}
