@@ -9,7 +9,7 @@ import heroImage from '~/assets/hero.jpg';
 import featureCounterImage from '~/assets/feature-counter.jpg';
 import featureBerriesImage from '~/assets/feature-berries.jpg';
 import featureWakeImage from '~/assets/feature-wake.jpg';
-import formulaPlaceholder from '~/assets/formula-placeholder.svg';
+import formulaImage from '~/assets/formula-glass.jpg';
 import {
   BEST_VALUE_KEY,
   PACK_ORDER,
@@ -577,8 +577,8 @@ function FormulaScience() {
           {/* Left: image container */}
           <div className="overflow-hidden rounded-3xl">
             <img
-              src={formulaPlaceholder}
-              alt="SleepFuel formula — image placeholder"
+              src={formulaImage}
+              alt="A SleepFuel stick pack beside a glass of mixed berry sleep drink with fresh lavender"
               className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]"
               loading="lazy"
             />
