@@ -1,4 +1,5 @@
-import {useState, type ReactElement} from 'react';
+import {useRef, useState, type ReactElement} from 'react';
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {Analytics} from '@shopify/hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
@@ -30,17 +31,54 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export async function loader(_args: Route.LoaderArgs) {
-  return {};
+export type HeroImage = {url: string; altText: string};
+
+const PRODUCT_HERO_QUERY = `#graphql
+  query ProductHero($handle: String!, $country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
+    product(handle: $handle) {
+      id
+      title
+      images(first: 12) {
+        nodes {
+          id
+          url
+          altText
+        }
+      }
+    }
+  }
+` as const;
+
+export async function loader({context}: Route.LoaderArgs) {
+  let heroImages: HeroImage[] = [];
+  try {
+    const {product} = await context.storefront.query<{
+      product?: {
+        images: {nodes: Array<{url: string; altText: string | null}>};
+      } | null;
+    }>(PRODUCT_HERO_QUERY, {variables: {handle: PRODUCT.handle}});
+
+    heroImages = (product?.images?.nodes ?? [])
+      .filter((node) => Boolean(node?.url))
+      .map((node) => ({url: node.url, altText: node.altText ?? ''}));
+  } catch {
+    // Hero imagery is non-critical — fall back to the bundled photo below.
+    heroImages = [];
+  }
+
+  return {heroImages};
 }
 
 export default function ProductPage() {
+  const {heroImages} = useLoaderData<typeof loader>();
   const [packKey, setPackKey] = useState<PackKey>('pack10');
   const [mode, setMode] = useState<PurchaseMode>('subscribe');
 
   return (
     <>
       <Hero
+        heroImages={heroImages}
         packKey={packKey}
         setPackKey={setPackKey}
         mode={mode}
@@ -76,11 +114,13 @@ export default function ProductPage() {
    ============================================================ */
 
 function Hero({
+  heroImages,
   packKey,
   setPackKey,
   mode,
   setMode,
 }: {
+  heroImages: HeroImage[];
   packKey: PackKey;
   setPackKey: (k: PackKey) => void;
   mode: PurchaseMode;
@@ -98,7 +138,7 @@ function Hero({
       {/* Left: product image — rounded on the visible (right) side, bleeds
           completely off the left edge of the page. */}
       <div className="relative min-h-[52vh] lg:min-h-[88vh]">
-        <HeroVisual />
+        <HeroVisual images={heroImages} />
       </div>
 
       {/* Right: buy box */}
@@ -107,7 +147,7 @@ function Hero({
           <p className="text-sm font-medium text-[color:var(--color-muted)]">
             SleepFuel Drink Mix · Mixed Berry
           </p>
-          <h1 className="mt-2 text-7xl font-normal leading-[1.05] tracking-tight sm:text-8xl">
+          <h1 className="mt-2 text-[54px] font-normal leading-[1.05] tracking-tight sm:text-[72px]">
             {PRODUCT.title}
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-[color:var(--color-muted)]">
@@ -211,36 +251,35 @@ function Hero({
           </fieldset>
 
           {/* Add to cart */}
-          <AddToCartButton
-            analytics={{type: 'hero-cta', packKey, mode}}
-            lines={[
-              {
-                merchandiseId: variant.merchandiseId,
-                quantity: 1,
-                ...(sellingPlanId ? {sellingPlanId} : {}),
-              },
-            ]}
-            onClick={() => open('cart')}
-            className="btn-blue mt-6 w-full text-base"
-          >
-            Add to Cart —{' '}
-            {showStrike && (
-              <span className="ml-1 text-white/60 line-through">
-                {formatPrice(base)}
-              </span>
-            )}{' '}
-            {formatPrice(final)}
-          </AddToCartButton>
+          <div className="mt-6 flex justify-center">
+            <AddToCartButton
+              analytics={{type: 'hero-cta', packKey, mode}}
+              lines={[
+                {
+                  merchandiseId: variant.merchandiseId,
+                  quantity: 1,
+                  ...(sellingPlanId ? {sellingPlanId} : {}),
+                },
+              ]}
+              onClick={() => open('cart')}
+              className="btn-blue px-8 text-base"
+            >
+              Add to Cart —{' '}
+              {showStrike && (
+                <span className="ml-1 text-white/60 line-through">
+                  {formatPrice(base)}
+                </span>
+              )}{' '}
+              {formatPrice(final)}
+            </AddToCartButton>
+          </div>
 
-          <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[color:var(--color-muted)]">
+          <ul className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-[color:var(--color-muted)]">
             <li className="flex items-center gap-1.5">
-              <Check /> Free US shipping
+              <Check /> Free US shipping $50+
             </li>
             <li className="flex items-center gap-1.5">
               <Check /> Cancel anytime
-            </li>
-            <li className="flex items-center gap-1.5">
-              <Check /> 100% money-back
             </li>
           </ul>
         </div>
@@ -249,15 +288,61 @@ function Hero({
   );
 }
 
-function HeroVisual() {
+function HeroVisual({images}: {images: HeroImage[]}) {
+  const slides: HeroImage[] = images.length
+    ? images
+    : [{url: heroImage, altText: 'A woman taking SleepFuel in bed at golden hour'}];
+
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  const goTo = (i: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const clamped = Math.max(0, Math.min(slides.length - 1, i));
+    track.scrollTo({left: track.clientWidth * clamped, behavior: 'smooth'});
+  };
+
+  const onScroll = () => {
+    const track = trackRef.current;
+    if (!track || track.clientWidth === 0) return;
+    setActive(Math.round(track.scrollLeft / track.clientWidth));
+  };
+
   return (
     <div className="absolute inset-y-0 right-0 left-0 overflow-hidden rounded-b-[1.75rem] lg:-left-16 lg:rounded-b-none lg:rounded-tr-[2.75rem] lg:rounded-br-[2.75rem]">
-      <img
-        src={heroImage}
-        alt="A woman taking SleepFuel in bed at golden hour"
-        className="h-full w-full object-cover"
-        loading="eager"
-      />
+      <div
+        ref={trackRef}
+        onScroll={onScroll}
+        className="flex h-full w-full snap-x snap-mandatory overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {slides.map((img, i) => (
+          <img
+            key={`${img.url}-${i}`}
+            src={img.url}
+            alt={img.altText || 'SleepFuel drink mix'}
+            className="h-full w-full shrink-0 snap-center object-cover"
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        ))}
+      </div>
+
+      {slides.length > 1 && (
+        <div className="absolute inset-x-0 bottom-5 flex justify-center gap-2 lg:left-16">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => goTo(i)}
+              aria-label={`Show image ${i + 1} of ${slides.length}`}
+              aria-current={active === i}
+              className={`h-2 rounded-full shadow-sm ring-1 ring-black/10 transition-all ${
+                active === i ? 'w-6 bg-white' : 'w-2 bg-white/60 hover:bg-white/80'
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -314,7 +399,7 @@ function FeatureCallouts() {
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <section className="mx-auto max-w-7xl px-5 pt-20 pb-10 sm:px-6 lg:px-8 lg:pt-28 lg:pb-14">
       <div className="grid gap-6 md:grid-cols-3">
         {features.map((f) => (
           <article key={f.title} className="flex flex-col">
@@ -482,8 +567,8 @@ const INGREDIENTS: Array<{
 function FormulaScience() {
   return (
     <section className="bg-[color:var(--color-cream)]">
-      <div className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
-        <h2 className="max-w-4xl text-5xl font-normal leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+      <div className="mx-auto max-w-7xl px-5 pt-10 pb-20 sm:px-6 lg:px-8 lg:pt-14 lg:pb-28">
+        <h2 className="max-w-4xl text-[36px] font-normal leading-[1.05] tracking-tight sm:text-[45px] lg:text-[54px]">
           Synergistic Ingredients.{' '}
           <span className="text-[color:var(--color-muted)]">Better Sleep.</span>
         </h2>
