@@ -638,7 +638,7 @@ const FAQS: Array<{q: string; a: string}> = [
   },
   {
     q: 'What’s your return policy?',
-    a: 'If SleepFuel isn’t working for you, we’ll refund your first box — no questions asked. Just email support@sleepfuel.com.',
+    a: 'If SleepFuel isn’t working for you, we’ll refund your first box — no questions asked. Just email support@sleepfuel.co.',
   },
 ];
 
