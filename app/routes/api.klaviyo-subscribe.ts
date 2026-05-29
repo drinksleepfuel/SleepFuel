@@ -1,106 +1,145 @@
 import type {Route} from './+types/api.klaviyo-subscribe';
 
 /**
- * Server-side endpoint that subscribes an email to a Klaviyo list and
- * returns the discount code to the client.
+ * Subscribes popup signups to Klaviyo via the public client-subscriptions
+ * endpoint — no secret key required (the company id is the public site key).
  *
- * Required env vars (set in `.env.local` for dev, Oxygen for prod):
- *   KLAVIYO_PRIVATE_API_KEY   — pk_… server-side key
- *   KLAVIYO_LIST_ID           — list to add subscribers to
- *   KLAVIYO_DISCOUNT_CODE     — e.g. "WELCOME15" (created in Shopify)
+ *   step=email → adds the email to the "Newsletter" list, returns WELCOME10
+ *   step=sms   → adds the phone (+ email) to the "SMS Subscriber" list,
+ *                returns WELCOME15. Klaviyo sends the SMS opt-in confirmation.
  *
- * If env vars aren't set, returns a 200 with `configured: false` so the
- * popup still "works" in dev — caller treats it as a success.
+ * The public ids below can be overridden by env vars if they ever change.
  */
+const KLAVIYO_REVISION = '2025-07-15';
+const COMPANY_ID_FALLBACK = 'RHRckF'; // public site id
+const EMAIL_LIST_FALLBACK = 'YmvR3r'; // "Newsletter" (single opt-in)
+const SMS_LIST_FALLBACK = 'VgaCiJ'; // "SMS Subscriber" (single opt-in)
+const EMAIL_DISCOUNT = 'WELCOME10';
+const SMS_DISCOUNT = 'WELCOME15';
+
+function normalizePhone(input: string): string | null {
+  const trimmed = input.trim();
+  const digits = trimmed.replace(/\D/g, '');
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
+  if (trimmed.startsWith('+') && digits.length >= 8 && digits.length <= 15) {
+    return `+${digits}`;
+  }
+  return null;
+}
+
+async function clientSubscribe(companyId: string, payload: unknown) {
+  return fetch(
+    `https://a.klaviyo.com/client/subscriptions/?company_id=${companyId}`,
+    {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        revision: KLAVIYO_REVISION,
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
 export async function action({request, context}: Route.ActionArgs) {
   if (request.method !== 'POST') {
     return Response.json({error: 'Method not allowed'}, {status: 405});
   }
 
-  const formData = await request.formData();
-  const email = String(formData.get('email') ?? '').trim().toLowerCase();
-
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return Response.json({error: 'Please enter a valid email.'}, {status: 400});
-  }
-
   const env = context.env as unknown as {
-    KLAVIYO_PRIVATE_API_KEY?: string;
-    KLAVIYO_LIST_ID?: string;
-    KLAVIYO_DISCOUNT_CODE?: string;
+    PUBLIC_KLAVIYO_COMPANY_ID?: string;
+    KLAVIYO_EMAIL_LIST_ID?: string;
+    KLAVIYO_SMS_LIST_ID?: string;
   };
-  const apiKey = env.KLAVIYO_PRIVATE_API_KEY;
-  const listId = env.KLAVIYO_LIST_ID;
-  const discountCode = env.KLAVIYO_DISCOUNT_CODE ?? 'WELCOME15';
+  const companyId = env.PUBLIC_KLAVIYO_COMPANY_ID || COMPANY_ID_FALLBACK;
+  const emailListId = env.KLAVIYO_EMAIL_LIST_ID || EMAIL_LIST_FALLBACK;
+  const smsListId = env.KLAVIYO_SMS_LIST_ID || SMS_LIST_FALLBACK;
 
-  if (!apiKey || !listId) {
-    // Not yet configured — still return success so the UX works in dev.
-    return Response.json({
-      success: true,
-      configured: false,
-      discountCode,
-    });
-  }
+  const formData = await request.formData();
+  const step = String(formData.get('step') ?? 'email');
+  const email = String(formData.get('email') ?? '')
+    .trim()
+    .toLowerCase();
+  const phoneRaw = String(formData.get('phone') ?? '').trim();
 
-  try {
-    // Create or update a profile, then subscribe it to the list.
-    // Klaviyo API: https://developers.klaviyo.com/en/reference/subscribe_profiles
-    const res = await fetch(
-      'https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/',
-      {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'content-type': 'application/json',
-          revision: '2025-07-15',
-          Authorization: `Klaviyo-API-Key ${apiKey}`,
-        },
-        body: JSON.stringify({
-          data: {
-            type: 'profile-subscription-bulk-create-job',
-            attributes: {
-              profiles: {
-                data: [
-                  {
-                    type: 'profile',
-                    attributes: {
-                      email,
-                      subscriptions: {
-                        email: {marketing: {consent: 'SUBSCRIBED'}},
-                      },
-                    },
-                  },
-                ],
+  if (step === 'email') {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return Response.json(
+        {error: 'Please enter a valid email.'},
+        {status: 400},
+      );
+    }
+    try {
+      const res = await clientSubscribe(companyId, {
+        data: {
+          type: 'subscription',
+          attributes: {
+            custom_source: 'SleepFuel storefront popup',
+            profile: {
+              data: {
+                type: 'profile',
+                attributes: {
+                  email,
+                  subscriptions: {email: {marketing: {consent: 'SUBSCRIBED'}}},
+                },
               },
-              custom_source: 'SleepFuel storefront popup',
-            },
-            relationships: {
-              list: {data: {type: 'list', id: listId}},
             },
           },
-        }),
-      },
-    );
+          relationships: {list: {data: {type: 'list', id: emailListId}}},
+        },
+      });
+      if (!res.ok && res.status !== 202) {
+        console.error('Klaviyo email subscribe:', res.status, await res.text());
+      }
+    } catch (err) {
+      // Non-blocking: the discount still works even if Klaviyo hiccups.
+      console.error('Klaviyo email error:', err);
+    }
+    return Response.json({success: true, discountCode: EMAIL_DISCOUNT});
+  }
 
-    if (!res.ok && res.status !== 202) {
-      const body = await res.text();
-      console.error('Klaviyo subscribe failed:', res.status, body);
+  if (step === 'sms') {
+    const phone = normalizePhone(phoneRaw);
+    if (!phone) {
       return Response.json(
-        {error: 'Subscription failed. Please try again.'},
+        {error: 'Please enter a valid US phone number.'},
+        {status: 400},
+      );
+    }
+    const profileAttributes: Record<string, unknown> = {
+      phone_number: phone,
+      subscriptions: {sms: {marketing: {consent: 'SUBSCRIBED'}}},
+    };
+    if (email) profileAttributes.email = email;
+    try {
+      const res = await clientSubscribe(companyId, {
+        data: {
+          type: 'subscription',
+          attributes: {
+            custom_source: 'SleepFuel storefront popup (SMS)',
+            profile: {data: {type: 'profile', attributes: profileAttributes}},
+          },
+          relationships: {list: {data: {type: 'list', id: smsListId}}},
+        },
+      });
+      if (!res.ok && res.status !== 202) {
+        console.error('Klaviyo sms subscribe:', res.status, await res.text());
+        return Response.json(
+          {error: 'Could not subscribe that number. Please try again.'},
+          {status: 502},
+        );
+      }
+    } catch (err) {
+      console.error('Klaviyo sms error:', err);
+      return Response.json(
+        {error: 'Something went wrong. Please try again.'},
         {status: 500},
       );
     }
-
-    return Response.json({
-      success: true,
-      configured: true,
-      discountCode,
-    });
-  } catch (err) {
-    console.error('Klaviyo error:', err);
-    return Response.json(
-      {error: 'Subscription failed. Please try again.'},
-      {status: 500},
-    );
+    return Response.json({success: true, discountCode: SMS_DISCOUNT});
   }
+
+  return Response.json({error: 'Unknown step.'}, {status: 400});
 }
