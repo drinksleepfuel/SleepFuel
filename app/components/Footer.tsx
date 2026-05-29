@@ -8,28 +8,23 @@ interface FooterProps {
   publicStoreDomain: string;
 }
 
-const FOOTER_COLUMNS = [
-  {
-    heading: 'Shop',
-    links: [
-      {label: 'SleepFuel Drink Mix', to: '/products/sleepfuel-drink-mix'},
-      {label: 'Subscribe & Save', to: '/products/sleepfuel-drink-mix'},
-    ],
-  },
+type FooterLink = {label: string; to: string; external?: boolean};
+type FooterColumn = {heading: string; links: FooterLink[]};
+
+// Shopify-hosted customer account portal — where subscriptions are managed.
+const ACCOUNT_LOGIN_URL = 'https://ykbc0p-1r.myshopify.com/account';
+
+const FOOTER_COLUMNS: FooterColumn[] = [
   {
     heading: 'Company',
-    links: [
-      {label: 'About Us', to: '/about'},
-      {label: 'The Science', to: '/about'},
-      {label: 'Careers', to: '/about'},
-    ],
+    links: [{label: 'About Us', to: '/about'}],
   },
   {
     heading: 'Support',
     links: [
       {label: 'Contact', to: '/contact'},
       {label: 'Shipping & Returns', to: '/contact'},
-      {label: 'Your Account', to: '/account'},
+      {label: 'Your Account', to: ACCOUNT_LOGIN_URL, external: true},
     ],
   },
   {
@@ -37,7 +32,6 @@ const FOOTER_COLUMNS = [
     links: [
       {label: 'Instagram', to: '/'},
       {label: 'TikTok', to: '/'},
-      {label: 'Newsletter', to: '/'},
     ],
   },
 ];
@@ -95,7 +89,10 @@ export function Footer(_props: FooterProps) {
             </form>
             <p className="mt-4 text-xs text-white/45">
               We care about protecting your data. Read more in our{' '}
-              <NavLink to="/" className="underline hover:text-white/80">
+              <NavLink
+                to="/privacy-policy"
+                className="underline hover:text-white/80"
+              >
                 Privacy Policy
               </NavLink>
               .
@@ -103,7 +100,7 @@ export function Footer(_props: FooterProps) {
           </div>
 
           {/* Link columns */}
-          <div className="grid grid-cols-2 gap-x-10 gap-y-8 sm:grid-cols-4 lg:gap-x-14">
+          <div className="grid grid-cols-2 gap-x-10 gap-y-8 sm:grid-cols-3 lg:gap-x-14">
             {FOOTER_COLUMNS.map((col) => (
               <div key={col.heading}>
                 <h3 className="text-sm font-semibold text-white/55">
@@ -112,13 +109,24 @@ export function Footer(_props: FooterProps) {
                 <ul className="mt-4 space-y-3">
                   {col.links.map((link, i) => (
                     <li key={`${link.label}-${i}`}>
-                      <NavLink
-                        to={link.to}
-                        prefetch="intent"
-                        className="text-sm text-white/85 hover:text-white"
-                      >
-                        {link.label}
-                      </NavLink>
+                      {link.external ? (
+                        <a
+                          href={link.to}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm text-white/85 hover:text-white"
+                        >
+                          {link.label}
+                        </a>
+                      ) : (
+                        <NavLink
+                          to={link.to}
+                          prefetch="intent"
+                          className="text-sm text-white/85 hover:text-white"
+                        >
+                          {link.label}
+                        </NavLink>
+                      )}
                     </li>
                   ))}
                 </ul>
