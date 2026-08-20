@@ -562,3 +562,24 @@ button.reset > * {
 .glass-dark {
   background: rgba(38, 34, 32, 0.82);
 }
+
+/* Promo ticker — continuous horizontal marquee at the top of every page.
+   Track holds two identical rows; the animation translates by -50% so the
+   second row seamlessly picks up where the first left off, then loops. */
+@keyframes sf-ticker-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+.sf-ticker { overflow: hidden; }
+.sf-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: sf-ticker-scroll 55s linear infinite;
+  will-change: transform;
+}
+.sf-ticker:hover .sf-ticker-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sf-ticker-track { animation: none; }
+}

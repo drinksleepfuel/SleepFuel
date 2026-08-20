@@ -16,6 +16,7 @@ import {
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
 import {EmailCapturePopup} from '~/components/EmailCapturePopup';
+import {PromoTicker} from '~/components/PromoTicker';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -39,6 +40,7 @@ export function PageLayout({
       <CartDrawer cart={cart} />
       <SearchAside />
       <MobileMenu cart={cart} isLoggedIn={isLoggedIn} />
+      <PromoTicker />
       <Header
         header={header}
         cart={cart}
