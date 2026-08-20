@@ -85,8 +85,11 @@ export default function ProductPage() {
         setMode={setMode}
       />
       <FeatureCallouts />
+      <CompetitorSection />
       <FormulaScience />
+      <UgcSection />
       <FAQSection />
+      <MocktailsSection />
 
       <StickyAddToCart packKey={packKey} mode={mode} />
 
@@ -289,60 +292,63 @@ function Hero({
 }
 
 function HeroVisual({images}: {images: HeroImage[]}) {
-  const slides: HeroImage[] = images.length
-    ? images
-    : [{url: heroImage, altText: 'A woman taking SleepFuel in bed at golden hour'}];
-
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-
-  const goTo = (i: number) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const clamped = Math.max(0, Math.min(slides.length - 1, i));
-    track.scrollTo({left: track.clientWidth * clamped, behavior: 'smooth'});
-  };
-
-  const onScroll = () => {
-    const track = trackRef.current;
-    if (!track || track.clientWidth === 0) return;
-    setActive(Math.round(track.scrollLeft / track.clientWidth));
-  };
+  // Split hero: video pane (placeholder for now) on the left, still on the right.
+  // Uses the Shopify product images for both panes; the "video coming" overlay
+  // makes it clear the left pane is where the real product video will land.
+  const videoStill =
+    images[0]?.url ?? (heroImage as unknown as string);
+  const stillImage =
+    images[1]?.url ?? images[0]?.url ?? (heroImage as unknown as string);
+  const stillAlt =
+    images[1]?.altText || images[0]?.altText || 'SleepFuel drink mix';
 
   return (
     <div className="absolute inset-y-0 right-0 left-0 overflow-hidden rounded-b-[1.75rem] lg:-left-16 lg:rounded-b-none lg:rounded-tr-[2.75rem] lg:rounded-br-[2.75rem]">
-      <div
-        ref={trackRef}
-        onScroll={onScroll}
-        className="flex h-full w-full snap-x snap-mandatory overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {slides.map((img, i) => (
+      <div className="grid h-full w-full grid-cols-2 gap-1">
+        {/* Left: video pane — placeholder until the real product video lands. */}
+        <div className="relative h-full overflow-hidden">
           <img
-            key={`${img.url}-${i}`}
-            src={img.url}
-            alt={img.altText || 'SleepFuel drink mix'}
-            className="h-full w-full shrink-0 snap-center object-cover"
-            loading={i === 0 ? 'eager' : 'lazy'}
+            src={videoStill}
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full object-cover"
+            loading="eager"
           />
-        ))}
-      </div>
-
-      {slides.length > 1 && (
-        <div className="absolute inset-x-0 bottom-5 flex justify-center gap-2 lg:left-16">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => goTo(i)}
-              aria-label={`Show image ${i + 1} of ${slides.length}`}
-              aria-current={active === i}
-              className={`h-2 rounded-full shadow-sm ring-1 ring-black/10 transition-all ${
-                active === i ? 'w-6 bg-white' : 'w-2 bg-white/60 hover:bg-white/80'
-              }`}
-            />
-          ))}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+            <div
+              className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30 sm:h-20 sm:w-20"
+              style={{
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+              }}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 20 20"
+                fill="rgba(255,255,255,0.95)"
+                aria-hidden="true"
+                className="sm:h-7 sm:w-7"
+              >
+                <path d="M7 5v10l8-5-8-5z" />
+              </svg>
+            </div>
+          </div>
+          <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-white/90 lg:left-20">
+            Video coming
+          </span>
         </div>
-      )}
+
+        {/* Right: still image. */}
+        <div className="relative h-full overflow-hidden">
+          <img
+            src={stillImage}
+            alt={stillAlt}
+            className="h-full w-full object-cover"
+            loading="eager"
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -692,5 +698,410 @@ function FAQItem({faq}: {faq: {q: string; a: string}}) {
         </p>
       )}
     </div>
+  );
+}
+
+/* ============================================================
+   Sleep Mocktails — 3 recipes built around one SleepFuel stick
+   ============================================================ */
+
+type Mocktail = {
+  name: string;
+  description: string;
+  ingredients: string[];
+  directions: string[];
+  tone: 'cherry' | 'chamomile' | 'latte';
+};
+
+const MOCKTAILS: Mocktail[] = [
+  {
+    name: 'Tart Cherry Sleep Cooler',
+    description:
+      'A crisp berry-forward sipper — tart cherry juice is nature’s melatonin, doubled up with SleepFuel.',
+    ingredients: [
+      '1 stick SleepFuel Drink Mix',
+      '3 oz tart cherry juice',
+      '3 oz sparkling mineral water',
+      'Ice',
+    ],
+    directions: [
+      'Fill a glass with ice.',
+      'In a shaker, combine 1 stick SleepFuel, 3 oz tart cherry juice, and a handful of ice.',
+      'Top with sparkling mineral water, stir gently, and enjoy.',
+    ],
+    tone: 'cherry',
+  },
+  {
+    name: 'Chamomile Moon Sipper',
+    description:
+      'Herbal and warm on the palate, cool in the glass — for the nights that ask you to slow down.',
+    ingredients: [
+      '1 stick SleepFuel Drink Mix',
+      '6 oz chilled chamomile tea (steeped and cooled)',
+      '1 tsp honey (optional)',
+      'A squeeze of lemon',
+      'Ice',
+    ],
+    directions: [
+      'Steep 1 chamomile tea bag in 6 oz hot water for 5 minutes, then chill.',
+      'In a shaker with ice, combine SleepFuel, chilled tea, honey, and a squeeze of lemon.',
+      'Strain into a glass over fresh ice. Sip slowly, breathe deeply.',
+    ],
+    tone: 'chamomile',
+  },
+  {
+    name: 'Golden Slumber Latte',
+    description:
+      'A creamy, warm-spiced wind-down. Serve gently warm on cold nights or over ice when it’s mild.',
+    ingredients: [
+      '1 stick SleepFuel Drink Mix',
+      '8 oz oat milk (warmed or over ice)',
+      '½ tsp vanilla extract',
+      'A pinch of cinnamon',
+    ],
+    directions: [
+      'Warm the oat milk gently, or leave cold and pour over ice.',
+      'Whisk in the SleepFuel stick until fully dissolved.',
+      'Stir in vanilla and cinnamon, pour into your favorite mug, and settle in.',
+    ],
+    tone: 'latte',
+  },
+];
+
+function MocktailsSection() {
+  return (
+    <section className="bg-[color:var(--color-cream)]">
+      <div className="mx-auto max-w-7xl px-5 pb-24 pt-14 sm:px-6 lg:px-8 lg:pb-28 lg:pt-16">
+        <div className="max-w-3xl">
+          <p className="text-sm font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+            Sleep Mocktails
+          </p>
+          <h2 className="mt-2 text-[36px] font-normal leading-[1.05] tracking-tight sm:text-[45px] lg:text-[54px]">
+            Turn your SleepFuel into a wind-down ritual.
+          </h2>
+          <p className="mt-4 max-w-xl text-lg leading-relaxed text-[color:var(--color-muted)]">
+            Three easy sleep-friendly mocktails. Each starts with one stick of
+            SleepFuel and takes under two minutes.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3">
+          {MOCKTAILS.map((r) => (
+            <RecipeCard key={r.name} recipe={r} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RecipeCard({recipe}: {recipe: Mocktail}) {
+  return (
+    <article className="flex flex-col">
+      <div className="aspect-[4/5] w-full overflow-hidden rounded-3xl">
+        <RecipeIllustration tone={recipe.tone} />
+      </div>
+      <h3 className="mt-5 text-2xl tracking-tight">{recipe.name}</h3>
+      <p className="mt-2 leading-relaxed text-[color:var(--color-muted)]">
+        {recipe.description}
+      </p>
+      <div className="mt-5">
+        <p className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+          Ingredients
+        </p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[color:var(--color-ink)]">
+          {recipe.ingredients.map((i) => (
+            <li key={i}>{i}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-5">
+        <p className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+          Directions
+        </p>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm leading-relaxed text-[color:var(--color-ink)]">
+          {recipe.directions.map((d) => (
+            <li key={d}>{d}</li>
+          ))}
+        </ol>
+      </div>
+    </article>
+  );
+}
+
+const TONE_GRADIENTS: Record<Mocktail['tone'], string> = {
+  cherry: 'linear-gradient(180deg, #b8556b 0%, #4a1a26 100%)',
+  chamomile: 'linear-gradient(180deg, #d8a660 0%, #5f4218 100%)',
+  latte: 'linear-gradient(180deg, #d9c9a6 0%, #8c6a3a 100%)',
+};
+
+function RecipeIllustration({tone}: {tone: Mocktail['tone']}) {
+  return (
+    <div
+      className="flex h-full w-full items-center justify-center"
+      style={{background: TONE_GRADIENTS[tone]}}
+      aria-hidden="true"
+    >
+      <svg
+        viewBox="0 0 200 260"
+        width="55%"
+        fill="none"
+        stroke="rgba(255,255,255,0.6)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M60 40 H140 L128 210 Q128 240 100 240 Q72 240 72 210 Z" />
+        <path d="M60 40 H140" />
+        <path d="M72 210 Q100 210 128 210" />
+        <path d="M155 62 l6 12 12 6 -12 6 -6 12 -6 -12 -12 -6 12 -6 Z" strokeWidth="1.8" />
+      </svg>
+    </div>
+  );
+}
+
+/* ============================================================
+   Competitor comparison — public facts only, dashes where unclear
+   ============================================================ */
+
+const COMPETITORS = ['Beam Dream', 'Kin Dream Light', 'Recess Mood'] as const;
+
+type CompetitorRow = {
+  label: string;
+  sleepfuel: string;
+  others: [string, string, string];
+};
+
+const COMPETITOR_ROWS: CompetitorRow[] = [
+  {
+    label: 'Melatonin',
+    sleepfuel: '2 mg · micro-dose',
+    others: ['3 mg', '0.25 mg', '—'],
+  },
+  {
+    label: 'Magnesium',
+    sleepfuel: '200 mg glycinate',
+    others: ['150 mg glycinate', 'Glycinate (dose unclear)', '~200 mg blend'],
+  },
+  {
+    label: 'L-Theanine',
+    sleepfuel: '200 mg',
+    others: ['200 mg', 'Unclear', 'Unclear'],
+  },
+  {label: 'GABA', sleepfuel: '200 mg', others: ['—', '—', '—']},
+  {label: 'Lemon balm', sleepfuel: '100 mg', others: ['—', '—', '—']},
+  {
+    label: 'No morning grogginess',
+    sleepfuel: '✓',
+    others: ['✓', '—', '—'],
+  },
+];
+
+const SLEEPFUEL_CELL_BG = 'color-mix(in srgb, var(--color-blue) 10%, white)';
+const SLEEPFUEL_HEADER_BG = 'var(--color-blue)';
+
+function CompetitorSection() {
+  return (
+    <section className="mx-auto max-w-7xl px-5 pt-16 pb-8 sm:px-6 lg:px-8 lg:pt-20 lg:pb-10">
+      <div className="max-w-3xl">
+        <p className="text-sm font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+          The competition
+        </p>
+        <h2 className="mt-2 text-[36px] font-normal leading-[1.05] tracking-tight sm:text-[45px] lg:text-[54px]">
+          How SleepFuel stacks up.
+        </h2>
+        <p className="mt-4 max-w-xl text-lg leading-relaxed text-[color:var(--color-muted)]">
+          A quick, honest look at how our formula compares to popular sleep
+          drinks. Publicly verifiable facts only — dashes where a competitor
+          doesn&rsquo;t disclose.
+        </p>
+      </div>
+
+      <div className="mt-10 overflow-x-auto">
+        <table className="w-full min-w-[720px] border-separate border-spacing-0 text-sm">
+          <thead>
+            <tr>
+              <th
+                scope="col"
+                className="w-[26%] px-3 py-4 text-left text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]"
+              >
+                <span className="sr-only">Category</span>
+              </th>
+              <th
+                scope="col"
+                className="rounded-t-2xl px-3 py-4 text-center text-base font-semibold text-white"
+                style={{background: SLEEPFUEL_HEADER_BG}}
+              >
+                SleepFuel
+              </th>
+              {COMPETITORS.map((name) => (
+                <th
+                  key={name}
+                  scope="col"
+                  className="px-3 py-4 text-center text-sm font-medium text-[color:var(--color-ink)]"
+                >
+                  {name}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {COMPETITOR_ROWS.map((row, i) => {
+              const last = i === COMPETITOR_ROWS.length - 1;
+              return (
+                <tr key={row.label}>
+                  <th
+                    scope="row"
+                    className={`border-t border-[color:var(--color-border)] px-3 py-4 text-left font-medium text-[color:var(--color-ink)]`}
+                  >
+                    {row.label}
+                  </th>
+                  <td
+                    className={`border-t border-[color:var(--color-blue)]/30 px-3 py-4 text-center font-semibold text-[color:var(--color-ink)] ${
+                      last ? 'rounded-b-2xl' : ''
+                    }`}
+                    style={{background: SLEEPFUEL_CELL_BG}}
+                  >
+                    {row.sleepfuel}
+                  </td>
+                  {row.others.map((v, j) => (
+                    <td
+                      key={j}
+                      className="border-t border-[color:var(--color-border)] px-3 py-4 text-center text-[color:var(--color-muted)]"
+                    >
+                      {v}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-4 text-xs text-[color:var(--color-muted)]">
+        Competitor data pulled from each brand&rsquo;s public product pages as
+        of {new Date().getFullYear()}. Doses and formulations may change.
+      </p>
+    </section>
+  );
+}
+
+/* ============================================================
+   UGC vertical-video carousel — placeholder cards for now
+   ============================================================ */
+
+type UgcTone = 'midnight' | 'plum' | 'olive' | 'sand' | 'rose';
+
+const UGC_CARDS: Array<{handle: string; tone: UgcTone}> = [
+  {handle: '@sleeplover', tone: 'midnight'},
+  {handle: '@midnightmuse', tone: 'plum'},
+  {handle: '@wellnessritual', tone: 'olive'},
+  {handle: '@nightowl.co', tone: 'sand'},
+  {handle: '@shutteye_official', tone: 'rose'},
+];
+
+const UGC_GRADIENTS: Record<UgcTone, string> = {
+  midnight: 'linear-gradient(160deg, #4a5578 0%, #1a1f30 100%)',
+  plum: 'linear-gradient(160deg, #7a4a63 0%, #2a1522 100%)',
+  olive: 'linear-gradient(160deg, #4d6160 0%, #1a2726 100%)',
+  sand: 'linear-gradient(160deg, #b89870 0%, #4a3820 100%)',
+  rose: 'linear-gradient(160deg, #c47b8a 0%, #4a1e2a 100%)',
+};
+
+function UgcSection() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  const onScroll = () => {
+    const t = trackRef.current;
+    if (!t) return;
+    const card = t.querySelector('[data-ugc-card]') as HTMLElement | null;
+    const step = card ? card.offsetWidth + 24 /* gap-6 */ : t.clientWidth;
+    setActive(Math.round(t.scrollLeft / step));
+  };
+
+  const goTo = (i: number) => {
+    const t = trackRef.current;
+    if (!t) return;
+    const card = t.querySelector('[data-ugc-card]') as HTMLElement | null;
+    const step = card ? card.offsetWidth + 24 : t.clientWidth;
+    const clamped = Math.max(0, Math.min(UGC_CARDS.length - 1, i));
+    t.scrollTo({left: step * clamped, behavior: 'smooth'});
+  };
+
+  return (
+    <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
+      <div className="flex items-end justify-between gap-6">
+        <div className="max-w-3xl">
+          <p className="text-sm font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+            From the community
+          </p>
+          <h2 className="mt-2 text-[32px] font-normal leading-[1.1] tracking-tight sm:text-[40px] lg:text-[48px]">
+            Better sleepers, real routines.
+          </h2>
+        </div>
+      </div>
+
+      <div
+        ref={trackRef}
+        onScroll={onScroll}
+        className="mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {UGC_CARDS.map((c) => (
+          <UgcCard key={c.handle} handle={c.handle} tone={c.tone} />
+        ))}
+      </div>
+
+      <div className="mt-6 flex justify-center gap-2">
+        {UGC_CARDS.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => goTo(i)}
+            aria-label={`Show video ${i + 1} of ${UGC_CARDS.length}`}
+            aria-current={active === i}
+            className={`h-2 rounded-full shadow-sm ring-1 ring-black/10 transition-all ${
+              active === i
+                ? 'w-6 bg-[color:var(--color-ink)]'
+                : 'w-2 bg-[color:var(--color-border)] hover:bg-[color:var(--color-muted)]'
+            }`}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function UgcCard({handle, tone}: {handle: string; tone: UgcTone}) {
+  return (
+    <figure
+      data-ugc-card
+      className="flex w-[240px] shrink-0 snap-center flex-col sm:w-[260px] lg:w-[280px]"
+    >
+      <div
+        className="relative aspect-[9/16] w-full overflow-hidden rounded-3xl"
+        style={{background: UGC_GRADIENTS[tone]}}
+      >
+        {/* subtle centered play triangle to signal "video coming" */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm ring-1 ring-white/20">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 20 20"
+              fill="rgba(255,255,255,0.9)"
+              aria-hidden="true"
+            >
+              <path d="M7 5v10l8-5-8-5z" />
+            </svg>
+          </div>
+        </div>
+        <span className="absolute left-3 top-3 rounded-full bg-black/40 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-white/85">
+          Video coming
+        </span>
+      </div>
+      <figcaption className="mt-4 text-center text-sm font-medium tracking-tight text-[color:var(--color-ink)]">
+        {handle}
+      </figcaption>
+    </figure>
   );
 }
