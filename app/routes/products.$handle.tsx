@@ -1,5 +1,5 @@
 import {useRef, useState, type ReactElement} from 'react';
-import {useLoaderData} from 'react-router';
+import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {Analytics} from '@shopify/hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
@@ -708,8 +708,7 @@ function FAQItem({faq}: {faq: {q: string; a: string}}) {
 type Mocktail = {
   name: string;
   description: string;
-  ingredients: string[];
-  directions: string[];
+  href: string; // full recipe lives on the blog
   tone: 'cherry' | 'chamomile' | 'latte';
 };
 
@@ -718,52 +717,21 @@ const MOCKTAILS: Mocktail[] = [
     name: 'Tart Cherry Sleep Cooler',
     description:
       'A crisp berry-forward sipper — tart cherry juice is nature’s melatonin, doubled up with SleepFuel.',
-    ingredients: [
-      '1 stick SleepFuel Drink Mix',
-      '3 oz tart cherry juice',
-      '3 oz sparkling mineral water',
-      'Ice',
-    ],
-    directions: [
-      'Fill a glass with ice.',
-      'In a shaker, combine 1 stick SleepFuel, 3 oz tart cherry juice, and a handful of ice.',
-      'Top with sparkling mineral water, stir gently, and enjoy.',
-    ],
+    href: '/blogs/recipes/tart-cherry-sleep-cooler',
     tone: 'cherry',
   },
   {
     name: 'Chamomile Moon Sipper',
     description:
       'Herbal and warm on the palate, cool in the glass — for the nights that ask you to slow down.',
-    ingredients: [
-      '1 stick SleepFuel Drink Mix',
-      '6 oz chilled chamomile tea (steeped and cooled)',
-      '1 tsp honey (optional)',
-      'A squeeze of lemon',
-      'Ice',
-    ],
-    directions: [
-      'Steep 1 chamomile tea bag in 6 oz hot water for 5 minutes, then chill.',
-      'In a shaker with ice, combine SleepFuel, chilled tea, honey, and a squeeze of lemon.',
-      'Strain into a glass over fresh ice. Sip slowly, breathe deeply.',
-    ],
+    href: '/blogs/recipes/chamomile-moon-sipper',
     tone: 'chamomile',
   },
   {
     name: 'Golden Slumber Latte',
     description:
       'A creamy, warm-spiced wind-down. Serve gently warm on cold nights or over ice when it’s mild.',
-    ingredients: [
-      '1 stick SleepFuel Drink Mix',
-      '8 oz oat milk (warmed or over ice)',
-      '½ tsp vanilla extract',
-      'A pinch of cinnamon',
-    ],
-    directions: [
-      'Warm the oat milk gently, or leave cold and pour over ice.',
-      'Whisk in the SleepFuel stick until fully dissolved.',
-      'Stir in vanilla and cinnamon, pour into your favorite mug, and settle in.',
-    ],
+    href: '/blogs/recipes/golden-slumber-latte',
     tone: 'latte',
   },
 ];
@@ -796,35 +764,25 @@ function MocktailsSection() {
 
 function RecipeCard({recipe}: {recipe: Mocktail}) {
   return (
-    <article className="flex flex-col">
+    <Link
+      to={recipe.href}
+      prefetch="intent"
+      className="group flex flex-col outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-blue)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-cream)]"
+    >
       <div className="aspect-[4/5] w-full overflow-hidden rounded-3xl">
         <RecipeIllustration tone={recipe.tone} />
       </div>
-      <h3 className="mt-5 text-2xl tracking-tight">{recipe.name}</h3>
+      <h3 className="mt-5 text-2xl tracking-tight transition-colors group-hover:text-[color:var(--color-blue)]">
+        {recipe.name}
+      </h3>
       <p className="mt-2 leading-relaxed text-[color:var(--color-muted)]">
         {recipe.description}
       </p>
-      <div className="mt-5">
-        <p className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-          Ingredients
-        </p>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[color:var(--color-ink)]">
-          {recipe.ingredients.map((i) => (
-            <li key={i}>{i}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="mt-5">
-        <p className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-          Directions
-        </p>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm leading-relaxed text-[color:var(--color-ink)]">
-          {recipe.directions.map((d) => (
-            <li key={d}>{d}</li>
-          ))}
-        </ol>
-      </div>
-    </article>
+      <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-ink)] transition-transform group-hover:translate-x-0.5">
+        Read the recipe
+        <span aria-hidden="true">→</span>
+      </span>
+    </Link>
   );
 }
 
@@ -863,45 +821,62 @@ function RecipeIllustration({tone}: {tone: Mocktail['tone']}) {
    Competitor comparison — public facts only, dashes where unclear
    ============================================================ */
 
-const COMPETITORS = ['Beam Dream', 'Kin Dream Light', 'Recess Mood'] as const;
+const COMPETITORS = [
+  'Beam Dream',
+  'AGZ',
+  'Moon Juice Sleepy',
+  'Moonbrew',
+] as const;
 
+type CompetitorCells = [string, string, string, string];
 type CompetitorRow = {
   label: string;
   sleepfuel: string;
-  others: [string, string, string];
+  others: CompetitorCells;
 };
 
 const COMPETITOR_ROWS: CompetitorRow[] = [
   {
     label: 'Melatonin',
     sleepfuel: '2 mg · micro-dose',
-    others: ['3 mg', '0.25 mg', '—'],
+    others: ['3 mg', '—', '0.3 mg phyto', '—'],
   },
   {
     label: 'Magnesium',
     sleepfuel: '200 mg glycinate',
-    others: ['150 mg glycinate', 'Glycinate (dose unclear)', '~200 mg blend'],
+    others: [
+      '150 mg bisglycinate',
+      'Magtein L-threonate (dose unclear)',
+      '200 mg (bisglycinate + gluconate)',
+      '57 mg (MagnesiREM)',
+    ],
   },
   {
     label: 'L-Theanine',
     sleepfuel: '200 mg',
-    others: ['200 mg', 'Unclear', 'Unclear'],
+    others: ['200 mg', 'Listed (dose unclear)', '112 mg', '250 mg'],
   },
-  {label: 'GABA', sleepfuel: '200 mg', others: ['—', '—', '—']},
-  {label: 'Lemon balm', sleepfuel: '100 mg', others: ['—', '—', '—']},
+  {label: 'GABA', sleepfuel: '200 mg', others: ['—', '—', '—', '—']},
+  {
+    label: 'Lemon balm',
+    sleepfuel: '100 mg',
+    others: ['—', 'Listed (dose unclear)', '—', '—'],
+  },
   {
     label: 'No morning grogginess',
     sleepfuel: '✓',
-    others: ['✓', '—', '—'],
+    others: ['✓', '✓', '✓', 'Unclear'],
+  },
+  {
+    label: 'Cost per night',
+    sleepfuel: '$2.80 · one-time',
+    others: ['$1.33', 'Unclear', '$1.40', 'Unclear'],
   },
 ];
 
-const SLEEPFUEL_CELL_BG = 'color-mix(in srgb, var(--color-blue) 10%, white)';
-const SLEEPFUEL_HEADER_BG = 'var(--color-blue)';
-
 function CompetitorSection() {
   return (
-    <section className="mx-auto max-w-7xl px-5 pt-16 pb-8 sm:px-6 lg:px-8 lg:pt-20 lg:pb-10">
+    <section className="mx-auto max-w-7xl px-5 pt-16 pb-12 sm:px-6 lg:px-8 lg:pt-20 lg:pb-16">
       <div className="max-w-3xl">
         <p className="text-sm font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
           The competition
@@ -917,19 +892,20 @@ function CompetitorSection() {
       </div>
 
       <div className="mt-10 overflow-x-auto">
-        <table className="w-full min-w-[720px] border-separate border-spacing-0 text-sm">
+        <table className="w-full min-w-[880px] border-separate border-spacing-0 text-sm">
           <thead>
             <tr>
               <th
                 scope="col"
-                className="w-[26%] px-3 py-4 text-left text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]"
+                className="w-[22%] px-3 py-4 text-left text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]"
               >
                 <span className="sr-only">Category</span>
               </th>
+              {/* SleepFuel header — animated aurora placeholder for the real
+                  looped product video. */}
               <th
                 scope="col"
-                className="rounded-t-2xl px-3 py-4 text-center text-base font-semibold text-white"
-                style={{background: SLEEPFUEL_HEADER_BG}}
+                className="sf-cell-video rounded-t-2xl px-3 py-4 text-center text-base font-semibold"
               >
                 SleepFuel
               </th>
@@ -951,15 +927,14 @@ function CompetitorSection() {
                 <tr key={row.label}>
                   <th
                     scope="row"
-                    className={`border-t border-[color:var(--color-border)] px-3 py-4 text-left font-medium text-[color:var(--color-ink)]`}
+                    className="border-t border-[color:var(--color-border)] px-3 py-4 text-left font-medium text-[color:var(--color-ink)]"
                   >
                     {row.label}
                   </th>
                   <td
-                    className={`border-t border-[color:var(--color-blue)]/30 px-3 py-4 text-center font-semibold text-[color:var(--color-ink)] ${
+                    className={`sf-cell-video border-t border-white/15 px-3 py-4 text-center font-semibold ${
                       last ? 'rounded-b-2xl' : ''
                     }`}
-                    style={{background: SLEEPFUEL_CELL_BG}}
                   >
                     {row.sleepfuel}
                   </td>
@@ -978,8 +953,8 @@ function CompetitorSection() {
         </table>
       </div>
       <p className="mt-4 text-xs text-[color:var(--color-muted)]">
-        Competitor data pulled from each brand&rsquo;s public product pages as
-        of {new Date().getFullYear()}. Doses and formulations may change.
+        Competitor data pulled from each brand&rsquo;s public product pages.
+        Doses, formulations, and prices may change.
       </p>
     </section>
   );

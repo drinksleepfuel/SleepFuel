@@ -583,3 +583,29 @@ button.reset > * {
 @media (prefers-reduced-motion: reduce) {
   .sf-ticker-track { animation: none; }
 }
+
+/* Video-callout treatment for the SleepFuel column of the competitor table.
+   Real looped motion via CSS (no video file) — swap to a <video> element
+   inside the cells whenever a real product-video loop is ready. All cells
+   in the column share the same keyframe timing, so the column reads as one
+   continuous animated background. */
+@keyframes sf-cell-aurora {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+.sf-cell-video {
+  background: linear-gradient(
+    120deg,
+    #1e40af 0%,
+    #3b82f6 30%,
+    #6366f1 55%,
+    #3b82f6 80%,
+    #1e40af 100%
+  );
+  background-size: 260% 100%;
+  animation: sf-cell-aurora 9s ease-in-out infinite;
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sf-cell-video { animation: none; }
+}
