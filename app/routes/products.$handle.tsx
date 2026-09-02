@@ -10,6 +10,10 @@ import featureCounterImage from '~/assets/feature-counter.jpg';
 import featureBerriesImage from '~/assets/feature-berries.jpg';
 import featureWakeImage from '~/assets/feature-wake.jpg';
 import formulaImage from '~/assets/formula-glass.jpg';
+import heroVideo from '~/assets/hero-video.mp4';
+import ingredientsVideo from '~/assets/ingredients-video.mp4';
+import mocktailChamomileImage from '~/assets/mocktail-chamomile.jpg';
+import mocktailLatteImage from '~/assets/mocktail-latte.jpg';
 import {
   BEST_VALUE_KEY,
   PACK_ORDER,
@@ -305,38 +309,19 @@ function HeroVisual({images}: {images: HeroImage[]}) {
   return (
     <div className="absolute inset-y-0 right-0 left-0 overflow-hidden rounded-b-[1.75rem] lg:-left-16 lg:rounded-b-none lg:rounded-tr-[2.75rem] lg:rounded-br-[2.75rem]">
       <div className="grid h-full w-full grid-cols-2 gap-1">
-        {/* Left: video pane — placeholder until the real product video lands. */}
+        {/* Left: looped hero product video. */}
         <div className="relative h-full overflow-hidden">
-          <img
-            src={videoStill}
-            alt=""
-            aria-hidden="true"
+          <video
+            src={heroVideo}
+            poster={videoStill}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label="SleepFuel drink mix pour"
             className="h-full w-full object-cover"
-            loading="eager"
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/25">
-            <div
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30 sm:h-20 sm:w-20"
-              style={{
-                backdropFilter: 'blur(4px)',
-                WebkitBackdropFilter: 'blur(4px)',
-              }}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 20 20"
-                fill="rgba(255,255,255,0.95)"
-                aria-hidden="true"
-                className="sm:h-7 sm:w-7"
-              >
-                <path d="M7 5v10l8-5-8-5z" />
-              </svg>
-            </div>
-          </div>
-          <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-white/90 lg:left-20">
-            Video coming
-          </span>
         </div>
 
         {/* Right: still image. */}
@@ -582,11 +567,16 @@ function FormulaScience() {
         <div className="mt-12 grid items-start gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-16">
           {/* Left: image container */}
           <div className="overflow-hidden rounded-3xl">
-            <img
-              src={formulaImage}
-              alt="A SleepFuel stick pack beside a glass of mixed berry sleep drink with fresh lavender"
-              className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]"
-              loading="lazy"
+            <video
+              src={ingredientsVideo}
+              poster={formulaImage}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Mixing SleepFuel into a glass"
+              className="aspect-square w-full object-cover"
             />
           </div>
 
@@ -738,6 +728,8 @@ type Mocktail = {
   description: string;
   href: string; // full recipe lives on the blog
   tone: 'cherry' | 'chamomile' | 'latte';
+  image?: string; // real photo; falls back to the tone illustration
+  imageAlt?: string;
 };
 
 const MOCKTAILS: Mocktail[] = [
@@ -754,6 +746,9 @@ const MOCKTAILS: Mocktail[] = [
       'Herbal and warm on the palate, cool in the glass — for the nights that ask you to slow down.',
     href: '/blogs/recipes/chamomile-moon-sipper',
     tone: 'chamomile',
+    image: mocktailChamomileImage,
+    imageAlt:
+      'A SleepFuel chamomile mocktail splashing in a glass with fresh berries',
   },
   {
     name: 'Golden Slumber Latte',
@@ -761,6 +756,9 @@ const MOCKTAILS: Mocktail[] = [
       'A creamy, warm-spiced wind-down. Serve gently warm on cold nights or over ice when it’s mild.',
     href: '/blogs/recipes/golden-slumber-latte',
     tone: 'latte',
+    image: mocktailLatteImage,
+    imageAlt:
+      'A tall glass of iced SleepFuel mocktail with strawberries, blackberries, and eucalyptus',
   },
 ];
 
@@ -798,7 +796,16 @@ function RecipeCard({recipe}: {recipe: Mocktail}) {
       className="group flex flex-col outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-blue)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-cream)]"
     >
       <div className="aspect-[4/5] w-full overflow-hidden rounded-3xl">
-        <RecipeIllustration tone={recipe.tone} />
+        {recipe.image ? (
+          <img
+            src={recipe.image}
+            alt={recipe.imageAlt ?? recipe.name}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <RecipeIllustration tone={recipe.tone} />
+        )}
       </div>
       <h3 className="mt-5 text-2xl tracking-tight transition-colors group-hover:text-[color:var(--color-blue)]">
         {recipe.name}
