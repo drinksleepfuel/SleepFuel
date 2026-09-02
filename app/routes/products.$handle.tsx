@@ -623,28 +623,56 @@ function FormulaScience() {
 
 const FAQS: Array<{q: string; a: string}> = [
   {
-    q: 'What’s in SleepFuel?',
-    a: 'Six evidence-backed ingredients: 200mg magnesium glycinate, 200mg L-theanine, 200mg GABA, 200mg inositol, 100mg lemon balm extract, and a 2mg micro-dose of melatonin. Mixed-berry natural flavor, no sugar, no artificial colors.',
+    q: 'Will I feel groggy the next morning?',
+    a: 'This is the number one fear with anything sleep-related, and it’s why we use 2mg of melatonin instead of the 5–10mg you’ll find in most sleep aids. That’s a low, physiologic dose, enough to support your natural wind-down without the next-day fog high-dose melatonin is known for. The rest of the formula, magnesium glycinate and L-theanine, works with your body’s own relaxation pathways, not against them.',
   },
   {
-    q: 'When and how do I take it?',
-    a: 'Mix one stick into cold or warm water about 30 minutes before bed. Make it part of a wind-down ritual — dim lights, no screens, a glass of SleepFuel.',
+    q: 'Is SleepFuel habit-forming?',
+    a: 'No. There’s nothing in SleepFuel that creates dependency. It’s a blend of minerals, amino acids, and botanicals that support your body’s natural sleep process, not a sedative. You can use it nightly or just when you need it, and stop anytime.',
   },
   {
-    q: 'Will I wake up groggy?',
-    a: 'No. Because we use a low melatonin dose and no sedating ingredients, most people report waking up clear and rested rather than knocked out.',
+    q: 'Why only 2mg of melatonin? Other brands have 10mg.',
+    a: 'Because more isn’t better. Research suggests lower doses closer to what your body produces naturally are effective for supporting sleep onset. High doses are where grogginess and vivid-dream complaints come from. We dosed for how you feel at 7am, not for a bigger number on the label.',
   },
   {
-    q: 'Is it safe to take every night?',
-    a: 'SleepFuel is formulated for nightly use and none of the ingredients are habit-forming. As with any supplement, talk to your doctor if you’re pregnant, nursing, or taking medication.',
+    q: 'How fast does it work, and when should I take it?',
+    a: 'Mix one stick pack into 6–8 oz of water about 30 minutes before bed. Most people feel the wind-down effect the first night. The magnesium benefits build with consistent use, so it gets better over the first couple of weeks.',
   },
   {
-    q: 'How does Subscribe & Save work?',
-    a: 'Subscribe and save 20% on every order. We ship a fresh box monthly — pause, skip, or cancel anytime from your account in two clicks.',
+    q: 'What does it taste like?',
+    a: 'Mixed Berry. Lightly sweet, with subtle lavender notes and no sugar, sweetened with stevia. It’s designed to be a ritual you actually look forward to, not something you choke down.',
   },
   {
-    q: 'What’s your return policy?',
-    a: 'If SleepFuel isn’t working for you, we’ll refund your first box — no questions asked. Just email support@sleepfuel.co.',
+    q: 'What’s in it, and why those ingredients?',
+    a: 'Five actives, each at a deliberate dose: magnesium glycinate (200mg) for relaxation and muscle ease, L-theanine (200mg) to quiet a racing mind, GABA (200mg) and lemon balm (100mg) to support calm, and 2mg of melatonin to cue sleep onset. Full amounts are on the label. No proprietary blends, no hidden doses.',
+  },
+  {
+    q: 'Can I take it every night?',
+    a: 'Yes, SleepFuel is formulated for nightly use. All ingredients are within established daily-use ranges, including the 200mg of magnesium, which sits comfortably under the supplemental daily limit.',
+  },
+  {
+    q: 'Can I take SleepFuel with other supplements or medications?',
+    a: 'If you take prescription medications, especially sedatives, blood pressure medication, or antidepressants, check with your doctor first. Same if you already take a magnesium supplement, so you don’t double up.',
+  },
+  {
+    q: 'Is it safe during pregnancy or for kids?',
+    a: 'SleepFuel is formulated for adults 18 and over. If you’re pregnant or nursing, talk to your doctor before use.',
+  },
+  {
+    q: 'Does it have sugar, calories, or anything artificial?',
+    a: 'No sugar (it’s sweetened with stevia) and zero calories per serving. It’s vegan, and colored with vegetable extract, not artificial dyes.',
+  },
+  {
+    q: 'Where is it made, and can I trust what’s in it?',
+    a: 'SleepFuel is made in the USA in a GMPC Certified Facility. Every active and its exact dose is printed on the label. No proprietary blends, nothing hidden. What you read is what’s in the stick pack.',
+  },
+  {
+    q: 'How does the subscription work? Can I cancel?',
+    a: 'Subscribe & Save gets you 20% off every order, shipped monthly. Skip, pause, or cancel anytime from your account page in about two clicks. No emails, no phone calls, no retention scripts.',
+  },
+  {
+    q: 'How fast is shipping?',
+    a: 'Orders ship within 1–2 business days from Texas. Free shipping on every subscription order.',
   },
 ];
 
