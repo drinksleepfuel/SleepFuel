@@ -13,6 +13,7 @@ import formulaImage from '~/assets/formula-glass.jpg';
 import heroVideo from '~/assets/hero-video.mp4';
 import ingredientsVideo from '~/assets/ingredients-video.mp4';
 import mocktailChamomileImage from '~/assets/mocktail-chamomile.jpg';
+import mocktailCherryImage from '~/assets/mocktail-cherry.jpg';
 import mocktailLatteImage from '~/assets/mocktail-latte.jpg';
 import {
   BEST_VALUE_KEY,
@@ -149,7 +150,7 @@ function Hero({
       </div>
 
       {/* Right: buy box */}
-      <div className="flex items-center px-5 py-12 sm:px-8 lg:px-14 lg:py-20">
+      <div className="flex items-center px-5 pt-12 pb-6 sm:px-8 sm:py-12 lg:px-14 lg:py-20">
         <div className="mx-auto w-full max-w-md">
           <p className="text-sm font-medium text-[color:var(--color-muted)]">
             SleepFuel Drink Mix · Mixed Berry
@@ -390,7 +391,7 @@ function FeatureCallouts() {
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-5 pt-20 pb-10 sm:px-6 lg:px-8 lg:pt-28 lg:pb-14">
+    <section className="mx-auto max-w-7xl px-5 pt-10 pb-10 sm:px-6 sm:pt-20 lg:px-8 lg:pt-28 lg:pb-14">
       <div className="grid gap-6 md:grid-cols-3">
         {features.map((f) => (
           <article key={f.title} className="flex flex-col">
@@ -558,7 +559,7 @@ const INGREDIENTS: Array<{
 function FormulaScience() {
   return (
     <section className="bg-[color:var(--color-cream)]">
-      <div className="mx-auto max-w-7xl px-5 pt-10 pb-20 sm:px-6 lg:px-8 lg:pt-14 lg:pb-28">
+      <div className="mx-auto max-w-7xl px-5 pt-10 pb-10 sm:px-6 sm:pb-20 lg:px-8 lg:pt-14 lg:pb-28">
         <h2 className="max-w-4xl text-[36px] font-normal leading-[1.05] tracking-tight sm:text-[45px] lg:text-[54px]">
           Synergistic Ingredients.{' '}
           <span className="text-[color:var(--color-muted)]">Better Sleep.</span>
@@ -739,6 +740,9 @@ const MOCKTAILS: Mocktail[] = [
       'A crisp berry-forward sipper — tart cherry juice is nature’s melatonin, doubled up with SleepFuel.',
     href: '/blogs/recipes/tart-cherry-sleep-cooler',
     tone: 'cherry',
+    image: mocktailCherryImage,
+    imageAlt:
+      'A calming SleepFuel berry smoothie in a glass',
   },
   {
     name: 'Chamomile Moon Sipper',
@@ -1039,7 +1043,7 @@ function UgcSection() {
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
+    <section className="mx-auto max-w-7xl px-5 pt-8 pb-16 sm:px-6 sm:pt-16 lg:px-8 lg:py-20">
       <div className="flex items-end justify-between gap-6">
         <div className="max-w-3xl">
           <p className="text-sm font-medium uppercase tracking-wide text-[color:var(--color-muted)]">

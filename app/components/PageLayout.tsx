@@ -47,7 +47,7 @@ export function PageLayout({
         isLoggedIn={isLoggedIn}
         publicStoreDomain={publicStoreDomain}
       />
-      <main className="flex min-h-[60vh] flex-col">{children}</main>
+      <main className="grow min-h-[60vh] overflow-x-hidden">{children}</main>
       <Footer
         footer={footer}
         header={header}
