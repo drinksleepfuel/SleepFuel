@@ -2,6 +2,7 @@ import {useRef, useState, type ReactElement} from 'react';
 import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {Analytics} from '@shopify/hydrogen';
+import {OkendoReviews, OkendoStarRating} from '@okendo/shopify-hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {StickyAddToCart} from '~/components/StickyAddToCart';
 import {useAside} from '~/components/Aside';
@@ -37,9 +38,10 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export type HeroImage = {url: string; altText: string};
+export type ReviewSnippet = {value: string} | null;
 
-const PRODUCT_HERO_QUERY = `#graphql
-  query ProductHero($handle: String!, $country: CountryCode, $language: LanguageCode)
+const PRODUCT_PAGE_QUERY = `#graphql
+  query ProductPage($handle: String!, $country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       id
@@ -51,32 +53,46 @@ const PRODUCT_HERO_QUERY = `#graphql
           altText
         }
       }
+      okendoStarRatingSnippet: metafield(namespace: "okendo", key: "StarRatingSnippet") {
+        value
+      }
+      okendoReviewsSnippet: metafield(namespace: "okendo", key: "ReviewsWidgetSnippet") {
+        value
+      }
     }
   }
 ` as const;
 
 export async function loader({context}: Route.LoaderArgs) {
   let heroImages: HeroImage[] = [];
+  let okendoStarRatingSnippet: ReviewSnippet = null;
+  let okendoReviewsSnippet: ReviewSnippet = null;
+
   try {
     const {product} = await context.storefront.query<{
       product?: {
         images: {nodes: Array<{url: string; altText: string | null}>};
+        okendoStarRatingSnippet: {value: string} | null;
+        okendoReviewsSnippet: {value: string} | null;
       } | null;
-    }>(PRODUCT_HERO_QUERY, {variables: {handle: PRODUCT.handle}});
+    }>(PRODUCT_PAGE_QUERY, {variables: {handle: PRODUCT.handle}});
 
     heroImages = (product?.images?.nodes ?? [])
       .filter((node) => Boolean(node?.url))
       .map((node) => ({url: node.url, altText: node.altText ?? ''}));
+    okendoStarRatingSnippet = product?.okendoStarRatingSnippet ?? null;
+    okendoReviewsSnippet = product?.okendoReviewsSnippet ?? null;
   } catch {
-    // Hero imagery is non-critical — fall back to the bundled photo below.
+    // Product data is non-critical — fall back to bundled hero + no reviews.
     heroImages = [];
   }
 
-  return {heroImages};
+  return {heroImages, okendoStarRatingSnippet, okendoReviewsSnippet};
 }
 
 export default function ProductPage() {
-  const {heroImages} = useLoaderData<typeof loader>();
+  const {heroImages, okendoStarRatingSnippet, okendoReviewsSnippet} =
+    useLoaderData<typeof loader>();
   const [packKey, setPackKey] = useState<PackKey>('pack10');
   const [mode, setMode] = useState<PurchaseMode>('subscribe');
 
@@ -84,6 +100,7 @@ export default function ProductPage() {
     <>
       <Hero
         heroImages={heroImages}
+        okendoStarRatingSnippet={okendoStarRatingSnippet}
         packKey={packKey}
         setPackKey={setPackKey}
         mode={mode}
@@ -93,6 +110,7 @@ export default function ProductPage() {
       <CompetitorSection />
       <FormulaScience />
       <UgcSection />
+      <OkendoReviewsSection snippet={okendoReviewsSnippet} />
       <FAQSection />
       <MocktailsSection />
 
@@ -123,12 +141,14 @@ export default function ProductPage() {
 
 function Hero({
   heroImages,
+  okendoStarRatingSnippet,
   packKey,
   setPackKey,
   mode,
   setMode,
 }: {
   heroImages: HeroImage[];
+  okendoStarRatingSnippet: ReviewSnippet;
   packKey: PackKey;
   setPackKey: (k: PackKey) => void;
   mode: PurchaseMode;
@@ -161,6 +181,13 @@ function Hero({
           <p className="mt-4 text-lg leading-relaxed text-[color:var(--color-muted)]">
             {PRODUCT.tagline}
           </p>
+
+          {/* Okendo star badge — links to the full reviews widget below. */}
+          <OkendoStarRating
+            className="mt-4"
+            productId={PRODUCT.id}
+            okendoStarRatingSnippet={okendoStarRatingSnippet}
+          />
 
           {/* Pack selector */}
           <fieldset className="mt-8">
@@ -717,6 +744,25 @@ function FAQItem({faq}: {faq: {q: string; a: string}}) {
         </p>
       )}
     </div>
+  );
+}
+
+/* ============================================================
+   Okendo reviews widget — full review list from the store's Okendo
+   metafield, enhanced client-side by @okendo/shopify-hydrogen.
+   ============================================================ */
+
+function OkendoReviewsSection({snippet}: {snippet: ReviewSnippet}) {
+  return (
+    <section
+      id="reviews"
+      className="mx-auto w-full max-w-5xl px-5 pt-12 pb-16 sm:px-6 lg:px-8 lg:pt-16 lg:pb-20"
+    >
+      <OkendoReviews
+        productId={PRODUCT.id}
+        okendoReviewsSnippet={snippet}
+      />
+    </section>
   );
 }
 

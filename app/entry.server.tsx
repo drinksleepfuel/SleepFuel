@@ -19,6 +19,26 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    // Okendo reviews widget assets + API. Hosts per Okendo's Hydrogen demo.
+    defaultSrc: [
+      'https://api.okendo.io',
+      'https://cdn-static.okendo.io',
+      'https://surveys.okendo.io',
+      'https://d3hw6dc1ow8pp2.cloudfront.net',
+      'https://d3g5hqndtiniji.cloudfront.net',
+      'https://dov7r31oq5dkj.cloudfront.net',
+    ],
+    styleSrc: [
+      'https://cdn-static.okendo.io',
+      'https://surveys.okendo.io',
+      'https://d3hw6dc1ow8pp2.cloudfront.net',
+    ],
+    connectSrc: [
+      'https://api.okendo.io',
+      'https://cdn-static.okendo.io',
+      'https://surveys.okendo.io',
+      'https://api.raygun.com',
+    ],
   });
 
   const body = await renderToReadableStream(

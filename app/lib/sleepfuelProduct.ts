@@ -101,6 +101,9 @@ export function formatPrice(n: number) {
 }
 
 export const PRODUCT = {
+  /** Real Storefront/Admin Product GID for the 10-Night listing (used for
+   * Okendo review widgets, which key off the product GID). */
+  id: 'gid://shopify/Product/7885621461078',
   handle: 'sleepfuel-drink-mix',
   title: 'SleepFuel Drink Mix',
   tagline:
