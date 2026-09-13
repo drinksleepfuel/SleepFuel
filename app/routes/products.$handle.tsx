@@ -11,6 +11,7 @@ import featureCounterImage from '~/assets/feature-counter.jpg';
 import featureBerriesImage from '~/assets/feature-berries.jpg';
 import featureWakeImage from '~/assets/feature-wake.jpg';
 import formulaImage from '~/assets/formula-glass.jpg';
+import comparisonBgVideo from '~/assets/comparison-bg.mp4';
 import heroVideo from '~/assets/hero-video.mp4';
 import ingredientsVideo from '~/assets/ingredients-video.mp4';
 import mocktailChamomileImage from '~/assets/mocktail-chamomile.jpg';
@@ -903,57 +904,26 @@ function RecipeIllustration({tone}: {tone: Mocktail['tone']}) {
    Competitor comparison — public facts only, dashes where unclear
    ============================================================ */
 
-const COMPETITORS = [
-  'Beam Dream',
-  'AGZ',
-  'Moon Juice Sleepy',
-  'Moonbrew',
-] as const;
-
-type CompetitorCells = [string, string, string, string];
 type CompetitorRow = {
   label: string;
   sleepfuel: string;
-  others: CompetitorCells;
+  others: string;
 };
 
 const COMPETITOR_ROWS: CompetitorRow[] = [
+  {label: 'Magnesium', sleepfuel: '200 mg', others: '< 200 mg'},
   {
     label: 'Melatonin',
     sleepfuel: '2 mg · micro-dose',
-    others: ['3 mg', '—', '0.3 mg phyto', '—'],
+    others: '> 3 mg · large dose',
   },
-  {
-    label: 'Magnesium',
-    sleepfuel: '200 mg glycinate',
-    others: [
-      '150 mg bisglycinate',
-      'Magtein L-threonate (dose unclear)',
-      '200 mg (bisglycinate + gluconate)',
-      '57 mg (MagnesiREM)',
-    ],
-  },
-  {
-    label: 'L-Theanine',
-    sleepfuel: '200 mg',
-    others: ['200 mg', 'Listed (dose unclear)', '112 mg', '250 mg'],
-  },
-  {label: 'GABA', sleepfuel: '200 mg', others: ['—', '—', '—', '—']},
-  {
-    label: 'Lemon balm',
-    sleepfuel: '100 mg',
-    others: ['—', 'Listed (dose unclear)', '—', '—'],
-  },
-  {
-    label: 'No morning grogginess',
-    sleepfuel: '✓',
-    others: ['✓', '✓', '✓', 'Unclear'],
-  },
-  {
-    label: 'Cost per night',
-    sleepfuel: '$2.80 · one-time',
-    others: ['$1.33', 'Unclear', '$1.40', 'Unclear'],
-  },
+  {label: 'L-Theanine', sleepfuel: '200 mg', others: '< 200 mg'},
+  {label: 'GABA', sleepfuel: '200 mg', others: '< 200 mg'},
+  {label: 'Lemon balm', sleepfuel: '100 mg', others: 'Not included'},
+  {label: 'Sugar free', sleepfuel: 'Yes', others: 'No'},
+  {label: 'Tastes great', sleepfuel: 'Always', others: 'No'},
+  {label: 'No next-day grogginess', sleepfuel: 'Never', others: 'Always'},
+  {label: 'Cost per night', sleepfuel: '~$2', others: '> $3'},
 ];
 
 function CompetitorSection() {
@@ -967,45 +937,56 @@ function CompetitorSection() {
           How SleepFuel stacks up.
         </h2>
         <p className="mt-4 max-w-xl text-lg leading-relaxed text-[color:var(--color-muted)]">
-          A quick, honest look at how our formula compares to popular sleep
-          drinks. Publicly verifiable facts only — dashes where a competitor
-          doesn&rsquo;t disclose.
+          A quick, honest look at how our formula compares to the field of
+          popular sleep drinks.
         </p>
       </div>
 
       <div className="mt-10 overflow-x-auto">
-        <table className="w-full min-w-[880px] border-separate border-spacing-0 text-sm">
-          <thead>
-            <tr>
-              <th
-                scope="col"
-                className="w-[22%] px-3 py-4 text-left text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]"
-              >
-                <span className="sr-only">Category</span>
-              </th>
-              {/* SleepFuel header — animated aurora placeholder for the real
-                  looped product video. */}
-              <th
-                scope="col"
-                className="sf-cell-video rounded-t-2xl px-3 py-4 text-center text-base font-semibold"
-              >
-                SleepFuel
-              </th>
-              {COMPETITORS.map((name) => (
+        <div className="relative">
+          {/* Looping bg video pinned behind the SleepFuel column. Column
+              widths below (34% / 33% / 33%) match this positioning. */}
+          <video
+            src={comparisonBgVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-[34%] z-0 h-full w-[33%] overflow-hidden rounded-2xl object-cover"
+            style={{filter: 'brightness(0.8)'}}
+          />
+          <table className="relative z-10 w-full min-w-[560px] border-separate border-spacing-0 text-sm">
+            <colgroup>
+              <col style={{width: '34%'}} />
+              <col style={{width: '33%'}} />
+              <col style={{width: '33%'}} />
+            </colgroup>
+            <thead>
+              <tr>
                 <th
-                  key={name}
+                  scope="col"
+                  className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]"
+                >
+                  <span className="sr-only">Category</span>
+                </th>
+                <th
+                  scope="col"
+                  className="px-3 py-4 text-center text-base font-semibold text-white"
+                >
+                  SleepFuel
+                </th>
+                <th
                   scope="col"
                   className="px-3 py-4 text-center text-sm font-medium text-[color:var(--color-ink)]"
                 >
-                  {name}
+                  Others
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {COMPETITOR_ROWS.map((row, i) => {
-              const last = i === COMPETITOR_ROWS.length - 1;
-              return (
+              </tr>
+            </thead>
+            <tbody>
+              {COMPETITOR_ROWS.map((row) => (
                 <tr key={row.label}>
                   <th
                     scope="row"
@@ -1013,31 +994,18 @@ function CompetitorSection() {
                   >
                     {row.label}
                   </th>
-                  <td
-                    className={`sf-cell-video border-t border-white/15 px-3 py-4 text-center font-semibold ${
-                      last ? 'rounded-b-2xl' : ''
-                    }`}
-                  >
+                  <td className="border-t border-white/15 px-3 py-4 text-center font-semibold text-white">
                     {row.sleepfuel}
                   </td>
-                  {row.others.map((v, j) => (
-                    <td
-                      key={j}
-                      className="border-t border-[color:var(--color-border)] px-3 py-4 text-center text-[color:var(--color-muted)]"
-                    >
-                      {v}
-                    </td>
-                  ))}
+                  <td className="border-t border-[color:var(--color-border)] px-3 py-4 text-center text-[color:var(--color-muted)]">
+                    {row.others}
+                  </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-      <p className="mt-4 text-xs text-[color:var(--color-muted)]">
-        Competitor data pulled from each brand&rsquo;s public product pages.
-        Doses, formulations, and prices may change.
-      </p>
     </section>
   );
 }
