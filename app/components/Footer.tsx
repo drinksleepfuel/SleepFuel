@@ -16,10 +16,6 @@ const ACCOUNT_LOGIN_URL = 'https://ykbc0p-1r.myshopify.com/account';
 
 const FOOTER_COLUMNS: FooterColumn[] = [
   {
-    heading: 'Company',
-    links: [{label: 'About Us', to: '/about'}],
-  },
-  {
     heading: 'Support',
     links: [
       {label: 'Contact', to: '/contact'},
@@ -100,7 +96,7 @@ export function Footer(_props: FooterProps) {
           </div>
 
           {/* Link columns */}
-          <div className="grid grid-cols-2 gap-x-10 gap-y-8 sm:grid-cols-3 lg:gap-x-14">
+          <div className="grid grid-cols-2 gap-x-10 gap-y-8 lg:gap-x-14">
             {FOOTER_COLUMNS.map((col) => (
               <div key={col.heading}>
                 <h3 className="text-sm font-semibold text-white/55">

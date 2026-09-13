@@ -23,7 +23,6 @@ type Viewport = 'desktop' | 'mobile';
 
 export const NAV_LINKS = [
   {label: 'Shop', to: '/products/sleepfuel-drink-mix'},
-  {label: 'About', to: '/about'},
 ];
 
 export function Header({cart, isLoggedIn}: HeaderProps) {

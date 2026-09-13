@@ -223,10 +223,10 @@ function SubscribeUpsell({lines}: {lines: DrawerLine[]}) {
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-[color:var(--color-ink)]">
-            Subscribe &amp; Save 20%
+            Subscribe &amp; Save 15%
           </p>
           <p className="mt-0.5 text-xs text-[color:var(--color-muted)]">
-            Switch to a monthly delivery for an extra 20% off — plus free
+            Switch to a monthly delivery for an extra 15% off — plus free
             shipping. Cancel anytime.
           </p>
         </div>
@@ -289,7 +289,7 @@ function DrawerLineItem({
             className="h-18 w-18 rounded-xl"
             style={{
               background:
-                'radial-gradient(120% 100% at 30% 25%, #3a4a6e 0%, #232a3f 60%, #14161f 100%)',
+                'radial-gradient(115% 100% at 30% 25%, #3a4a6e 0%, #232a3f 60%, #14161f 100%)',
             }}
           />
         )}

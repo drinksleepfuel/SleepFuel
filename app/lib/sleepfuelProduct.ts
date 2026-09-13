@@ -6,12 +6,12 @@
  * one-time add-to-cart works end-to-end.
  *
  * Subscribe & Save: each product has a recurring "Subscribe and save" selling
- * plan (20% off) configured in the Shopify admin, wired up in
+ * plan (15% off) configured in the Shopify admin, wired up in
  * `SELLING_PLAN_IDS`. Subscribe mode attaches the plan so the discount is
  * honored at checkout (see `sellingPlanFor`).
  */
 
-export const SUBSCRIBE_DISCOUNT = 0.2; // 20% off when subscribed
+export const SUBSCRIBE_DISCOUNT = 0.15; // 15% off when subscribed
 
 /** Order subtotal (USD) required to unlock free shipping. */
 export const FREE_SHIPPING_THRESHOLD = 49;

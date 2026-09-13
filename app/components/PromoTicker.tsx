@@ -5,7 +5,7 @@
  */
 const TICKER_MESSAGES = [
   'Free US shipping on orders $50+',
-  'Subscribe & Save 20% — cancel anytime',
+  'Subscribe & Save 15% — cancel anytime',
   '6 evidence-backed ingredients',
   'Fall asleep faster. Wake up clear.',
   'Powered by Magnesium, L-Theanine + micro-dose Melatonin',

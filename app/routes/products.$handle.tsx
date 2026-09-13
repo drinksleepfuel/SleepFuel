@@ -172,10 +172,7 @@ function Hero({
       {/* Right: buy box */}
       <div className="flex items-center px-5 pt-12 pb-6 sm:px-8 sm:py-12 lg:px-14 lg:py-20">
         <div className="mx-auto w-full max-w-md">
-          <p className="text-sm font-medium text-[color:var(--color-muted)]">
-            SleepFuel Drink Mix · Mixed Berry
-          </p>
-          <h1 className="mt-2 text-[54px] font-normal leading-[1.05] tracking-tight sm:text-[72px]">
+          <h1 className="text-[54px] font-normal leading-[1.05] tracking-tight sm:text-[72px]">
             {PRODUCT.title}
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-[color:var(--color-muted)]">
@@ -686,7 +683,7 @@ const FAQS: Array<{q: string; a: string}> = [
   },
   {
     q: 'How does the subscription work? Can I cancel?',
-    a: 'Subscribe & Save gets you 20% off every order, shipped monthly. Skip, pause, or cancel anytime from your account page in about two clicks. No emails, no phone calls, no retention scripts.',
+    a: 'Subscribe & Save gets you 15% off every order, shipped monthly. Skip, pause, or cancel anytime from your account page in about two clicks. No emails, no phone calls, no retention scripts.',
   },
   {
     q: 'How fast is shipping?',
