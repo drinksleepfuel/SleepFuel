@@ -26,6 +26,7 @@ import mocktailChamomileImage from '~/assets/mocktail-chamomile.jpg';
 import mocktailCherryImage from '~/assets/mocktail-cherry.jpg';
 import mocktailLatteImage from '~/assets/mocktail-latte.jpg';
 import {PRODUCT, VARIANTS, priceFor} from '~/lib/sleepfuelProduct';
+import {WeaverseContent} from '~/weaverse';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -60,7 +61,7 @@ const PRODUCT_PAGE_QUERY = `#graphql
   }
 ` as const;
 
-export async function loader({context}: Route.LoaderArgs) {
+export async function loader({context, params}: Route.LoaderArgs) {
   let heroImages: HeroImage[] = [];
   let okendoStarRatingSnippet: ReviewSnippet = null;
   let okendoReviewsSnippet: ReviewSnippet = null;
@@ -84,14 +85,87 @@ export async function loader({context}: Route.LoaderArgs) {
     heroImages = [];
   }
 
-  return {heroImages, okendoStarRatingSnippet, okendoReviewsSnippet};
+  // Studio owns this page's content. If Weaverse is unreachable we keep the
+  // code-rendered sections below rather than serving a blank product page —
+  // this is the storefront's only revenue page.
+  const weaverseData = await context.weaverse
+    .loadPage({type: 'PRODUCT', handle: params.handle ?? PRODUCT.handle})
+    .catch(() => null);
+
+  return {
+    heroImages,
+    okendoStarRatingSnippet,
+    okendoReviewsSnippet,
+    weaverseData,
+  };
+}
+
+/**
+ * True when Weaverse returned real published content. `loadPage` resolves a
+ * synthetic "fallback" page when a handle has nothing published, which would
+ * otherwise render an empty document.
+ */
+function hasWeaversePage(data: {page?: {id?: string}} | null): boolean {
+  const id = data?.page?.id;
+  return Boolean(id) && !String(id).includes('fallback');
 }
 
 export default function ProductPage() {
-  const {heroImages, okendoStarRatingSnippet, okendoReviewsSnippet} =
-    useLoaderData<typeof loader>();
+  const {
+    heroImages,
+    okendoStarRatingSnippet,
+    okendoReviewsSnippet,
+    weaverseData,
+  } = useLoaderData<typeof loader>();
   const {packKey, mode} = usePurchaseState();
 
+  return (
+    <>
+      {hasWeaversePage(weaverseData) ? (
+        <WeaverseContent />
+      ) : (
+        <CodeRenderedSections
+          heroImages={heroImages}
+          okendoStarRatingSnippet={okendoStarRatingSnippet}
+          okendoReviewsSnippet={okendoReviewsSnippet}
+        />
+      )}
+
+      <StickyAddToCart packKey={packKey} mode={mode} />
+
+      <Analytics.ProductView
+        data={{
+          products: [
+            {
+              id: VARIANTS[packKey].merchandiseId,
+              title: PRODUCT.title,
+              price: String(priceFor(packKey, mode).final),
+              vendor: 'SleepFuel',
+              variantId: VARIANTS[packKey].merchandiseId,
+              variantTitle: VARIANTS[packKey].label,
+              quantity: 1,
+            },
+          ],
+        }}
+      />
+    </>
+  );
+}
+
+/**
+ * The pre-Weaverse section tree, kept as a fallback for when Studio content
+ * cannot be loaded. Content here and in Studio can drift; Studio is the
+ * source of truth whenever it responds.
+ */
+function CodeRenderedSections({
+  heroImages,
+  okendoStarRatingSnippet,
+  okendoReviewsSnippet,
+}: {
+  heroImages: HeroImage[];
+  okendoStarRatingSnippet: ReviewSnippet;
+  okendoReviewsSnippet: ReviewSnippet;
+}) {
   return (
     <>
       <Hero
@@ -181,24 +255,6 @@ export default function ProductPage() {
           />
         ))}
       </MocktailsSection>
-
-      <StickyAddToCart packKey={packKey} mode={mode} />
-
-      <Analytics.ProductView
-        data={{
-          products: [
-            {
-              id: VARIANTS[packKey].merchandiseId,
-              title: PRODUCT.title,
-              price: String(priceFor(packKey, mode).final),
-              vendor: 'SleepFuel',
-              variantId: VARIANTS[packKey].merchandiseId,
-              variantTitle: VARIANTS[packKey].label,
-              quantity: 1,
-            },
-          ],
-        }}
-      />
     </>
   );
 }

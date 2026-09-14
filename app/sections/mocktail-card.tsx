@@ -2,9 +2,19 @@ import {forwardRef} from 'react';
 import {Link} from 'react-router';
 import {createSchema, type HydrogenComponentProps} from '@weaverse/hydrogen';
 import mocktailCherryImage from '~/assets/mocktail-cherry.jpg';
+import mocktailChamomileImage from '~/assets/mocktail-chamomile.jpg';
+import mocktailLatteImage from '~/assets/mocktail-latte.jpg';
 import {imageAlt, imageUrl, type WeaverseImage} from './shared';
 
+/** Bundled recipe photos; see the note in `feature-callout-item`. */
+const MOCKTAIL_IMAGES = {
+  cherry: mocktailCherryImage,
+  chamomile: mocktailChamomileImage,
+  latte: mocktailLatteImage,
+} as unknown as Record<string, string>;
+
 type MocktailCardProps = Partial<HydrogenComponentProps> & {
+  imageKey?: keyof typeof MOCKTAIL_IMAGES;
   name?: string;
   description?: string;
   href?: string;
@@ -16,7 +26,17 @@ type MocktailCardProps = Partial<HydrogenComponentProps> & {
 /** One recipe card inside `mocktails`. */
 const MocktailCard = forwardRef<HTMLAnchorElement, MocktailCardProps>(
   function MocktailCard(
-    {name, description, href, image, imageAlt: alt, ctaLabel, children, ...rest},
+    {
+      name,
+      description,
+      href,
+      image,
+      imageKey,
+      imageAlt: alt,
+      ctaLabel,
+      children,
+      ...rest
+    },
     ref,
   ) {
     return (
@@ -29,7 +49,10 @@ const MocktailCard = forwardRef<HTMLAnchorElement, MocktailCardProps>(
       >
         <div className="aspect-[4/5] w-full overflow-hidden rounded-3xl">
           <img
-            src={imageUrl(image ?? null, mocktailCherryImage as unknown as string)}
+            src={imageUrl(
+              image ?? null,
+              MOCKTAIL_IMAGES[imageKey ?? 'cherry'] ?? MOCKTAIL_IMAGES.cherry,
+            )}
             alt={imageAlt(image ?? null, alt || name || '')}
             className="h-full w-full object-cover"
             loading="lazy"
@@ -60,7 +83,20 @@ export const schema = createSchema({
     {
       group: 'Content',
       inputs: [
-        {type: 'image', name: 'image', label: 'Photo'},
+        {type: 'image', name: 'image', label: 'Photo (overrides the bundled one)'},
+        {
+          type: 'select',
+          name: 'imageKey',
+          label: 'Bundled photo',
+          configs: {
+            options: [
+              {value: 'cherry', label: 'Tart cherry'},
+              {value: 'chamomile', label: 'Chamomile'},
+              {value: 'latte', label: 'Golden latte'},
+            ],
+          },
+          defaultValue: 'cherry',
+        },
         {type: 'text', name: 'imageAlt', label: 'Photo alt text'},
         {type: 'text', name: 'name', label: 'Recipe name'},
         {type: 'textarea', name: 'description', label: 'Description'},

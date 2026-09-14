@@ -1,9 +1,23 @@
 import {forwardRef} from 'react';
 import {createSchema, type HydrogenComponentProps} from '@weaverse/hydrogen';
 import featureCounterImage from '~/assets/feature-counter.jpg';
+import featureBerriesImage from '~/assets/feature-berries.jpg';
+import featureWakeImage from '~/assets/feature-wake.jpg';
 import {imageAlt, imageUrl, type WeaverseImage} from './shared';
 
+/**
+ * The photos this card ships with. `imageKey` picks one so the bundled asset
+ * stays the fallback without every card collapsing onto the same photo; an
+ * uploaded `image` still wins when a merchant sets one.
+ */
+const FEATURE_IMAGES = {
+  counter: featureCounterImage,
+  berries: featureBerriesImage,
+  wake: featureWakeImage,
+} as unknown as Record<string, string>;
+
 type FeatureCalloutItemProps = Partial<HydrogenComponentProps> & {
+  imageKey?: keyof typeof FEATURE_IMAGES;
   eyebrow?: string;
   title?: string;
   copy?: string;
@@ -14,10 +28,13 @@ type FeatureCalloutItemProps = Partial<HydrogenComponentProps> & {
 /** One photo card inside `feature-callouts`. */
 const FeatureCalloutItem = forwardRef<HTMLElement, FeatureCalloutItemProps>(
   function FeatureCalloutItem(
-    {eyebrow, title, copy, image, alt, children, ...rest},
+    {eyebrow, title, copy, image, imageKey, alt, children, ...rest},
     ref,
   ) {
-    const src = imageUrl(image ?? null, featureCounterImage as unknown as string);
+    const src = imageUrl(
+      image ?? null,
+      FEATURE_IMAGES[imageKey ?? 'counter'] ?? FEATURE_IMAGES.counter,
+    );
     const altText = imageAlt(image ?? null, alt ?? '');
 
     return (
@@ -52,7 +69,20 @@ export const schema = createSchema({
     {
       group: 'Content',
       inputs: [
-        {type: 'image', name: 'image', label: 'Photo'},
+        {type: 'image', name: 'image', label: 'Photo (overrides the bundled one)'},
+        {
+          type: 'select',
+          name: 'imageKey',
+          label: 'Bundled photo',
+          configs: {
+            options: [
+              {value: 'counter', label: 'Counter'},
+              {value: 'berries', label: 'Berries'},
+              {value: 'wake', label: 'Wake up'},
+            ],
+          },
+          defaultValue: 'counter',
+        },
         {type: 'text', name: 'alt', label: 'Photo alt text'},
         {type: 'text', name: 'title', label: 'Title'},
         {type: 'text', name: 'eyebrow', label: 'Eyebrow'},
