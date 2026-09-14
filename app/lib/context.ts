@@ -1,9 +1,6 @@
 import {createHydrogenContext} from '@shopify/hydrogen';
-import {WeaverseClient} from '@weaverse/hydrogen';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
-import {components} from '~/weaverse/components';
-import {themeSchema} from '~/weaverse/schema.server';
 
 // Define the additional context object
 const additionalContext = {
@@ -18,11 +15,7 @@ const additionalContext = {
 type AdditionalContextType = typeof additionalContext;
 
 declare global {
-  interface HydrogenAdditionalContext extends AdditionalContextType {
-    // Attached via `Object.assign` below, so it has to be declared here for
-    // `context.weaverse` to be visible in loaders and actions.
-    weaverse: WeaverseClient;
-  }
+  interface HydrogenAdditionalContext extends AdditionalContextType {}
 }
 
 /**
@@ -62,20 +55,6 @@ export async function createHydrogenRouterContext(
     },
     additionalContext,
   );
-
-  const weaverse = new WeaverseClient({
-    ...hydrogenContext,
-    request,
-    cache,
-    themeSchema,
-    components,
-  });
-
-  // Attach to the existing instance rather than returning a spread copy:
-  // `createHydrogenContext` returns a RouterContextProvider *class instance*,
-  // and spreading it would flatten the prototype and break `context.get()`
-  // plus Hydrogen middleware at runtime.
-  Object.assign(hydrogenContext, {weaverse});
 
   return hydrogenContext;
 }

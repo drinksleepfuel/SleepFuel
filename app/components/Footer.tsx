@@ -1,10 +1,6 @@
 import {NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import logoUrl from '~/assets/logo.png';
-import {
-  useThemeSetting,
-  useThemeSettingLinks,
-} from '~/weaverse/use-theme-setting';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -40,28 +36,6 @@ const FDA_DISCLAIMER = `* These statements have not been evaluated by the Food a
 Information on this site is provided for informational purposes only. It is not meant to substitute for medical advice from your physician or other medical professional. You should not use the information contained herein for diagnosing or treating a health problem or disease, or prescribing any medication. Carefully read all product documentation. If you have or suspect that you have a medical problem, promptly contact your regular health care provider.`;
 
 export function Footer(_props: FooterProps) {
-  // Editable in Weaverse Studio under Theme > Customize > Footer. The
-  // constants above remain the shipped defaults until a merchant saves.
-  const newsletterHeading = useThemeSetting(
-    'footerNewsletterHeading',
-    'Get sleep tips, science, offers, and 15% off your first order.',
-  );
-  const disclaimer = useThemeSetting('footerDisclaimer', FDA_DISCLAIMER);
-  const supportHeading = useThemeSetting('footerSupportHeading', 'Support');
-  const connectHeading = useThemeSetting('footerConnectHeading', 'Connect');
-  const supportLinks = useThemeSettingLinks(
-    'footerSupportLinks',
-    FOOTER_COLUMNS[0].links,
-  );
-  const connectLinks = useThemeSettingLinks(
-    'footerConnectLinks',
-    FOOTER_COLUMNS[1].links,
-  );
-  const columns: FooterColumn[] = [
-    {heading: supportHeading, links: supportLinks},
-    {heading: connectHeading, links: connectLinks},
-  ];
-
   return (
     <footer
       className="relative mt-auto"
@@ -87,7 +61,7 @@ export function Footer(_props: FooterProps) {
               style={{filter: 'brightness(0) invert(1)'}}
             />
             <h2 className="mt-6 text-2xl leading-snug text-white/90">
-              {newsletterHeading}
+              Get sleep tips, science, offers, and 15% off your first order.
             </h2>
             <form
               className="mt-5 flex max-w-sm items-center gap-2 rounded-full border border-white/20 bg-white/5 px-2 py-1.5"
@@ -123,7 +97,7 @@ export function Footer(_props: FooterProps) {
 
           {/* Link columns */}
           <div className="grid grid-cols-2 gap-x-10 gap-y-8 lg:gap-x-14">
-            {columns.map((col) => (
+            {FOOTER_COLUMNS.map((col) => (
               <div key={col.heading}>
                 <h3 className="text-sm font-semibold text-white/55">
                   {col.heading}
@@ -159,7 +133,7 @@ export function Footer(_props: FooterProps) {
 
         {/* Disclaimer */}
         <div className="pt-8 text-xs leading-relaxed text-white/45">
-          <p className="whitespace-pre-line">{disclaimer}</p>
+          <p className="whitespace-pre-line">{FDA_DISCLAIMER}</p>
           <p className="mt-6">
             © {new Date().getFullYear()} SleepFuel. All rights reserved.
           </p>

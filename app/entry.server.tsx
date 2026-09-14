@@ -6,7 +6,6 @@ import {
   type HydrogenRouterContextProvider,
 } from '@shopify/hydrogen';
 import type {EntryContext} from 'react-router';
-import {getWeaverseCsp, mergeCsp} from '~/weaverse/csp';
 
 export default async function handleRequest(
   request: Request,
@@ -15,8 +14,12 @@ export default async function handleRequest(
   reactRouterContext: EntryContext,
   context: HydrogenRouterContextProvider,
 ) {
-  // Okendo reviews widget assets + API. Hosts per Okendo's Hydrogen demo.
-  const okendoCsp = {
+  const {nonce, header, NonceProvider} = createContentSecurityPolicy({
+    shop: {
+      checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
+      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
+    },
+    // Okendo reviews widget assets + API. Hosts per Okendo's Hydrogen demo.
     defaultSrc: [
       'https://api.okendo.io',
       'https://cdn-static.okendo.io',
@@ -36,16 +39,6 @@ export default async function handleRequest(
       'https://surveys.okendo.io',
       'https://api.raygun.com',
     ],
-  };
-
-  // `mergeCsp` concatenates per-directive source lists, so the Weaverse Studio
-  // hosts are added *alongside* Okendo's rather than replacing them.
-  const {nonce, header, NonceProvider} = createContentSecurityPolicy({
-    shop: {
-      checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
-      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
-    },
-    ...mergeCsp(okendoCsp, getWeaverseCsp(request, context)),
   });
 
   const body = await renderToReadableStream(

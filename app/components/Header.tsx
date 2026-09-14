@@ -1,5 +1,4 @@
 import {Suspense, useEffect, useState} from 'react';
-import {useThemeSettingLinks} from '~/weaverse/use-theme-setting';
 import {Await, NavLink, useAsyncValue} from 'react-router';
 import {
   type CartViewPayload,
@@ -101,9 +100,6 @@ function Logo() {
 
 export function HeaderMenu({viewport}: {viewport: Viewport}) {
   const {close} = useAside();
-  // Editable in Studio under Theme > Customize > Header, as `Label | /path`
-  // lines. NAV_LINKS stays the shipped default.
-  const navLinks = useThemeSettingLinks('headerNavLinks', NAV_LINKS);
   const className =
     viewport === 'desktop'
       ? 'hidden md:flex items-center gap-8'
@@ -111,7 +107,7 @@ export function HeaderMenu({viewport}: {viewport: Viewport}) {
 
   return (
     <nav className={className} role="navigation">
-      {navLinks.map((link) => (
+      {NAV_LINKS.map((link) => (
         <NavLink
           key={link.to}
           prefetch="intent"
