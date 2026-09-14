@@ -1,4 +1,5 @@
 import {Link} from 'react-router';
+import {PurchaseStateProvider} from '~/lib/purchaseState';
 import {useId} from 'react';
 import type {
   CartApiQueryFragment,
@@ -37,23 +38,28 @@ export function PageLayout({
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
-      <CartDrawer cart={cart} />
-      <SearchAside />
-      <MobileMenu cart={cart} isLoggedIn={isLoggedIn} />
-      <PromoTicker />
-      <Header
-        header={header}
-        cart={cart}
-        isLoggedIn={isLoggedIn}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <main className="grow min-h-[60vh] overflow-x-hidden">{children}</main>
-      <Footer
-        footer={footer}
-        header={header}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <EmailCapturePopup />
+      {/* Wraps the whole tree so the buy box, the sticky add-to-cart bar, and
+          the analytics payload share one selection even when Weaverse renders
+          those sections independently. */}
+      <PurchaseStateProvider>
+        <CartDrawer cart={cart} />
+        <SearchAside />
+        <MobileMenu cart={cart} isLoggedIn={isLoggedIn} />
+        <PromoTicker />
+        <Header
+          header={header}
+          cart={cart}
+          isLoggedIn={isLoggedIn}
+          publicStoreDomain={publicStoreDomain}
+        />
+        <main className="grow min-h-[60vh] overflow-x-hidden">{children}</main>
+        <Footer
+          footer={footer}
+          header={header}
+          publicStoreDomain={publicStoreDomain}
+        />
+        <EmailCapturePopup />
+      </PurchaseStateProvider>
     </Aside.Provider>
   );
 }
