@@ -1,4 +1,5 @@
 import type {HydrogenComponent} from '@weaverse/hydrogen';
+import * as Hero from '~/sections/hero';
 import * as FeatureCallouts from '~/sections/feature-callouts';
 import * as FeatureCalloutItem from '~/sections/feature-callout-item';
 import * as CompetitorSection from '~/sections/competitor';
@@ -23,6 +24,7 @@ import * as MocktailCard from '~/sections/mocktail-card';
  * picker reading like the page itself.
  */
 export const components: HydrogenComponent[] = [
+  Hero,
   FeatureCallouts,
   FeatureCalloutItem,
   CompetitorSection,
