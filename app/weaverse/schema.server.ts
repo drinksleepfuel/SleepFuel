@@ -72,5 +72,103 @@ export const themeSchema: HydrogenThemeSchema = {
         },
       ],
     },
+    {
+      group: 'Promo ticker',
+      inputs: [
+        {
+          type: 'textarea',
+          name: 'tickerMessages',
+          label: 'Messages (one per line)',
+          defaultValue: [
+            'Free US shipping on orders $50+',
+            'Subscribe & Save 15% — cancel anytime',
+            '6 evidence-backed ingredients',
+            'Fall asleep faster. Wake up clear.',
+            'Powered by Magnesium, L-Theanine + micro-dose Melatonin',
+          ].join('\n'),
+        },
+      ],
+    },
+    {
+      group: 'Header',
+      inputs: [
+        {
+          type: 'textarea',
+          name: 'headerNavLinks',
+          label: 'Nav links (one "Label | /path" per line)',
+          defaultValue: 'Shop | /products/sleepfuel-drink-mix',
+        },
+      ],
+    },
+    {
+      group: 'Footer',
+      inputs: [
+        {
+          type: 'text',
+          name: 'footerNewsletterHeading',
+          label: 'Newsletter heading',
+          defaultValue:
+            'Get sleep tips, science, offers, and 15% off your first order.',
+        },
+        {
+          type: 'text',
+          name: 'footerSupportHeading',
+          label: 'Column 1 heading',
+          defaultValue: 'Support',
+        },
+        {
+          type: 'textarea',
+          name: 'footerSupportLinks',
+          label: 'Column 1 links (one "Label | /path" per line)',
+        },
+        {
+          type: 'text',
+          name: 'footerConnectHeading',
+          label: 'Column 2 heading',
+          defaultValue: 'Connect',
+        },
+        {
+          type: 'textarea',
+          name: 'footerConnectLinks',
+          label: 'Column 2 links (one "Label | /path" per line)',
+        },
+        {
+          type: 'textarea',
+          name: 'footerDisclaimer',
+          label: 'FDA disclaimer',
+        },
+      ],
+    },
+    {
+      group: 'Email popup',
+      inputs: [
+        {
+          type: 'text',
+          name: 'popupEmailTitle',
+          label: 'Step 1 title',
+          defaultValue: 'Claim Your 10% Off',
+        },
+        {
+          type: 'textarea',
+          name: 'popupEmailSubtitle',
+          label: 'Step 1 subtitle',
+          defaultValue:
+            'Sign up to unlock your code, valid for any SleepFuel order.',
+        },
+        {
+          type: 'text',
+          name: 'popupSmsTitle',
+          label: 'Step 2 title',
+          defaultValue: 'Get 15% Off Now',
+        },
+        {
+          type: 'textarea',
+          name: 'popupSmsSubtitle',
+          label: 'Step 2 subtitle',
+          defaultValue:
+            'Even more savings when you subscribe to SMS for exclusive offers and sleep science.',
+        },
+      ],
+    },
   ],
 };

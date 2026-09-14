@@ -1,4 +1,5 @@
 import {useEffect, useState, type FormEvent} from 'react';
+import {useThemeSetting} from '~/weaverse/use-theme-setting';
 import popupImage from '~/assets/feature-counter.jpg';
 
 const COOKIE_NAME = 'sf_popup_seen';
@@ -31,6 +32,19 @@ export function EmailCapturePopup() {
   const [status, setStatus] = useState<Status>('idle');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [revealCode, setRevealCode] = useState('WELCOME10');
+
+  // Headline copy is editable in Studio (Theme > Customize > Email popup).
+  // The Klaviyo flow, list ids, and discount codes stay in code on purpose.
+  const emailTitle = useThemeSetting('popupEmailTitle', 'Claim Your 10% Off');
+  const emailSubtitle = useThemeSetting(
+    'popupEmailSubtitle',
+    'Sign up to unlock your code, valid for any SleepFuel order.',
+  );
+  const smsTitle = useThemeSetting('popupSmsTitle', 'Get 15% Off Now');
+  const smsSubtitle = useThemeSetting(
+    'popupSmsSubtitle',
+    'Even more savings when you subscribe to SMS for exclusive offers and sleep science.',
+  );
 
   useEffect(() => {
     if (hasCookie(COOKIE_NAME)) return;
@@ -154,8 +168,8 @@ export function EmailCapturePopup() {
 
           {step === 'email' && (
             <Pane
-              title="Claim Your 10% Off"
-              subtitle="Sign up to unlock your code, valid for any SleepFuel order."
+              title={emailTitle}
+              subtitle={emailSubtitle}
             >
               <form onSubmit={handleEmail} className="mt-6 space-y-3">
                 <label className="block">
@@ -196,8 +210,8 @@ export function EmailCapturePopup() {
 
           {step === 'phone' && (
             <Pane
-              title="Get 15% Off Now"
-              subtitle="Even more savings when you subscribe to SMS for exclusive offers and sleep science."
+              title={smsTitle}
+              subtitle={smsSubtitle}
             >
               <form onSubmit={handlePhone} className="mt-6 space-y-3">
                 <div className="flex items-center rounded-2xl border border-[color:var(--color-jet)] bg-[color:var(--color-neutral)] px-4 focus-within:border-[color:var(--color-midnight)]">
