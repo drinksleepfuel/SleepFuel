@@ -88,9 +88,11 @@ export async function loader({context, params}: Route.LoaderArgs) {
   // Studio owns this page's content. If Weaverse is unreachable we keep the
   // code-rendered sections below rather than serving a blank product page —
   // this is the storefront's only revenue page.
-  const weaverseData = await context.weaverse
-    .loadPage({type: 'PRODUCT', handle: params.handle ?? PRODUCT.handle})
-    .catch(() => null);
+  const weaverseData = context.weaverse
+    ? await context.weaverse
+        .loadPage({type: 'PRODUCT', handle: params.handle ?? PRODUCT.handle})
+        .catch(() => null)
+    : null;
 
   return {
     heroImages,

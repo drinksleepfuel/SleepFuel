@@ -20,8 +20,9 @@ type AdditionalContextType = typeof additionalContext;
 declare global {
   interface HydrogenAdditionalContext extends AdditionalContextType {
     // Attached via `Object.assign` below, so it has to be declared here for
-    // `context.weaverse` to be visible in loaders and actions.
-    weaverse: WeaverseClient;
+    // `context.weaverse` to be visible in loaders and actions. Optional:
+    // construction is skipped when WEAVERSE_PROJECT_ID is missing.
+    weaverse?: WeaverseClient;
   }
 }
 
@@ -63,19 +64,38 @@ export async function createHydrogenRouterContext(
     additionalContext,
   );
 
-  const weaverse = new WeaverseClient({
-    ...hydrogenContext,
-    request,
-    cache,
-    themeSchema,
-    components,
-  });
+  // Weaverse is optional at runtime. `new WeaverseClient()` throws when
+  // WEAVERSE_PROJECT_ID is absent — and because this runs during context
+  // creation, that throw 500s EVERY route, ahead of any route-level fallback.
+  // A storefront missing the env var (a fresh Oxygen environment, say) must
+  // still serve pages, so construction is guarded and `context.weaverse` is
+  // left undefined when it fails.
+  if (env.WEAVERSE_PROJECT_ID) {
+    try {
+      const weaverse = new WeaverseClient({
+        ...hydrogenContext,
+        request,
+        cache,
+        themeSchema,
+        components,
+      });
 
-  // Attach to the existing instance rather than returning a spread copy:
-  // `createHydrogenContext` returns a RouterContextProvider *class instance*,
-  // and spreading it would flatten the prototype and break `context.get()`
-  // plus Hydrogen middleware at runtime.
-  Object.assign(hydrogenContext, {weaverse});
+      // Attach to the existing instance rather than returning a spread copy:
+      // `createHydrogenContext` returns a RouterContextProvider *class
+      // instance*, and spreading it would flatten the prototype and break
+      // `context.get()` plus Hydrogen middleware at runtime.
+      Object.assign(hydrogenContext, {weaverse});
+    } catch (error) {
+      console.error(
+        'WeaverseClient failed to initialize; serving without Weaverse.',
+        error,
+      );
+    }
+  } else {
+    console.warn(
+      'WEAVERSE_PROJECT_ID is not set; serving without Weaverse content.',
+    );
+  }
 
   return hydrogenContext;
 }
