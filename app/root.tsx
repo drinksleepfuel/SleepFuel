@@ -1,4 +1,5 @@
 import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
+import {withWeaverse} from '@weaverse/hydrogen';
 import {
   getOkendoProviderData,
   OkendoProvider,
@@ -25,6 +26,7 @@ import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
+import {GlobalStyle} from '~/weaverse/style';
 
 export type RootLoader = typeof loader;
 
@@ -162,7 +164,16 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   };
 }
 
-export function Layout({children}: {children?: React.ReactNode}) {
+/**
+ * Wrapped with `withWeaverse` rather than the default `App` export: Weaverse
+ * v5 needs its providers *above* the document boundary for theme settings and
+ * Studio design mode to initialize.
+ */
+export const Layout = withWeaverse(function RootLayout({
+  children,
+}: {
+  children?: React.ReactNode;
+}) {
   const nonce = useNonce();
 
   return (
@@ -178,6 +189,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
         <Links />
+        <GlobalStyle />
       </head>
       <body>
         {children}
@@ -186,7 +198,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
       </body>
     </html>
   );
-}
+});
 
 export default function App() {
   const data = useRouteLoaderData<RootLoader>('root');
