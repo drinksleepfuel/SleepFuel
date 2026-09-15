@@ -79,6 +79,16 @@ export async function loader(args: Route.LoaderArgs) {
 
   const {storefront, env} = args.context;
 
+  // Weaverse theme settings drive the ticker, header, footer, and popup copy.
+  // The SDK reads them from the ROOT loader specifically (see
+  // useCreateThemeSettingsStore -> useRouteLoaderData('root').weaverseTheme),
+  // so loading them anywhere else leaves every `useThemeSetting` call falling
+  // back to its hardcoded default. Guarded and caught: a Weaverse outage must
+  // degrade to the shipped copy, never break the document.
+  const weaverseTheme = args.context.weaverse
+    ? await args.context.weaverse.loadThemeSettings().catch(() => null)
+    : null;
+
   const okendoSubscriberId =
     (env as unknown as {PUBLIC_OKENDO_SUBSCRIBER_ID?: string})
       .PUBLIC_OKENDO_SUBSCRIBER_ID || OKENDO_SUBSCRIBER_ID_FALLBACK;
@@ -86,6 +96,7 @@ export async function loader(args: Route.LoaderArgs) {
   return {
     ...deferredData,
     ...criticalData,
+    weaverseTheme,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     okendoSubscriberId,
     shop: getShopAnalytics({
