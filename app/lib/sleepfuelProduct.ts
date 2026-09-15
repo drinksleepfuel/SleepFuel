@@ -87,7 +87,18 @@ export const MERCHANDISE_TO_SELLING_PLAN: Record<string, string> =
   );
 
 export function priceFor(key: PackKey, mode: PurchaseMode) {
-  const base = VARIANTS[key].basePrice;
+  return priceFrom(VARIANTS[key].basePrice, mode);
+}
+
+/**
+ * Applies the subscribe discount to a base price. Prefer this with a live
+ * Shopify price (see `fetchVariantData`) so the page can't advertise a figure
+ * the checkout won't honour; `priceFor` is the bundled-constant fallback.
+ *
+ * SUBSCRIBE_DISCOUNT is verified to match the Shopify selling plans, which are
+ * all "Deliver every 4 weeks, 15% off".
+ */
+export function priceFrom(base: number, mode: PurchaseMode) {
   const final = mode === 'subscribe' ? base * (1 - SUBSCRIBE_DISCOUNT) : base;
   return {base, final};
 }

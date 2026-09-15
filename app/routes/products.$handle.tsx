@@ -25,12 +25,12 @@ import featureWakeImage from '~/assets/feature-wake.jpg';
 import mocktailChamomileImage from '~/assets/mocktail-chamomile.jpg';
 import mocktailCherryImage from '~/assets/mocktail-cherry.jpg';
 import mocktailLatteImage from '~/assets/mocktail-latte.jpg';
-import {PRODUCT, VARIANTS, priceFor} from '~/lib/sleepfuelProduct';
+import {PRODUCT, VARIANTS, priceFrom} from '~/lib/sleepfuelProduct';
 import {
-  ALL_AVAILABLE,
-  fetchAvailability,
-  type AvailabilityMap,
-} from '~/lib/variantAvailability';
+  FALLBACK_VARIANT_INFO,
+  fetchVariantData,
+  type VariantInfoMap,
+} from '~/lib/variantData';
 import {WeaverseContent} from '~/weaverse';
 
 export const meta: Route.MetaFunction = () => {
@@ -104,7 +104,7 @@ export async function loader({context, params}: Route.LoaderArgs) {
     okendoStarRatingSnippet,
     okendoReviewsSnippet,
     weaverseData,
-    availability: await fetchAvailability(context.storefront),
+    variantInfo: await fetchVariantData(context.storefront),
   };
 }
 
@@ -124,7 +124,7 @@ export default function ProductPage() {
     okendoStarRatingSnippet,
     okendoReviewsSnippet,
     weaverseData,
-    availability,
+    variantInfo,
   } = useLoaderData<typeof loader>();
   const {packKey, mode} = usePurchaseState();
 
@@ -137,14 +137,14 @@ export default function ProductPage() {
           heroImages={heroImages}
           okendoStarRatingSnippet={okendoStarRatingSnippet}
           okendoReviewsSnippet={okendoReviewsSnippet}
-          availability={availability}
+          variantInfo={variantInfo}
         />
       )}
 
       <StickyAddToCart
         packKey={packKey}
         mode={mode}
-        availability={availability}
+        variantInfo={variantInfo}
       />
 
       <Analytics.ProductView
@@ -153,7 +153,7 @@ export default function ProductPage() {
             {
               id: VARIANTS[packKey].merchandiseId,
               title: PRODUCT.title,
-              price: String(priceFor(packKey, mode).final),
+              price: String(priceFrom(variantInfo[packKey].price, mode).final),
               vendor: 'SleepFuel',
               variantId: VARIANTS[packKey].merchandiseId,
               variantTitle: VARIANTS[packKey].label,
@@ -175,19 +175,19 @@ function CodeRenderedSections({
   heroImages,
   okendoStarRatingSnippet,
   okendoReviewsSnippet,
-  availability = ALL_AVAILABLE,
+  variantInfo = FALLBACK_VARIANT_INFO,
 }: {
   heroImages: HeroImage[];
   okendoStarRatingSnippet: ReviewSnippet;
   okendoReviewsSnippet: ReviewSnippet;
-  availability?: AvailabilityMap;
+  variantInfo?: VariantInfoMap;
 }) {
   return (
     <>
       <Hero
         heroImages={heroImages}
         okendoStarRatingSnippet={okendoStarRatingSnippet}
-        availability={availability}
+        variantInfo={variantInfo}
         heading={PRODUCT.title}
         tagline={PRODUCT.tagline}
         sizeLegend="Choose your size"

@@ -9,10 +9,10 @@ import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {usePurchaseState} from '~/lib/purchaseState';
 import {
-  ALL_AVAILABLE,
-  fetchAvailability,
-  type AvailabilityMap,
-} from '~/lib/variantAvailability';
+  FALLBACK_VARIANT_INFO,
+  fetchVariantData,
+  type VariantInfoMap,
+} from '~/lib/variantData';
 import heroImage from '~/assets/hero.jpg';
 import heroVideo from '~/assets/hero-video.mp4';
 import {
@@ -22,7 +22,7 @@ import {
   SUBSCRIBE_DISCOUNT,
   VARIANTS,
   formatPrice,
-  priceFor,
+  priceFrom,
   sellingPlanFor,
 } from '~/lib/sleepfuelProduct';
 
@@ -32,7 +32,7 @@ export type ReviewSnippet = {value: string} | null;
 type HeroProps = Partial<HydrogenComponentProps> & {
   heroImages?: HeroImage[];
   okendoStarRatingSnippet?: ReviewSnippet;
-  availability?: AvailabilityMap;
+  variantInfo?: VariantInfoMap;
   heading?: string;
   tagline?: string;
   sizeLegend?: string;
@@ -61,7 +61,7 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
   {
     heroImages,
     okendoStarRatingSnippet,
-    availability,
+    variantInfo,
     heading,
     tagline,
     sizeLegend,
@@ -82,11 +82,12 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
   const images = heroImages ?? loaderData?.heroImages ?? [];
   const starSnippet =
     okendoStarRatingSnippet ?? loaderData?.okendoStarRatingSnippet ?? null;
-  const available = availability ?? loaderData?.availability ?? ALL_AVAILABLE;
-  const packSoldOut = !available[packKey];
+  // Live Shopify price and stock; falls back to the bundled constants.
+  const info = variantInfo ?? loaderData?.variantInfo ?? FALLBACK_VARIANT_INFO;
+  const packSoldOut = !info[packKey].available;
   const {open} = useAside();
   const variant = VARIANTS[packKey];
-  const {base, final} = priceFor(packKey, mode);
+  const {base, final} = priceFrom(info[packKey].price, mode);
   const showStrike = mode === 'subscribe';
   const sellingPlanId =
     mode === 'subscribe' ? sellingPlanFor(packKey) : undefined;
@@ -128,10 +129,10 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
             <div className="mt-3 grid grid-cols-3 gap-2.5">
               {PACK_ORDER.map((k) => {
                 const v = VARIANTS[k];
-                const p = priceFor(k, mode);
+                const p = priceFrom(info[k].price, mode);
                 const selected = packKey === k;
                 const recommended = k === BEST_VALUE_KEY;
-                const soldOut = !available[k];
+                const soldOut = !info[k].available;
                 return (
                   <button
                     key={k}
@@ -367,13 +368,13 @@ export const loader = async ({weaverse}: ComponentLoaderArgs) => {
         .filter((node) => Boolean(node?.url))
         .map((node) => ({url: node.url, altText: node.altText ?? ''})),
       okendoStarRatingSnippet: product?.okendoStarRatingSnippet ?? null,
-      availability: await fetchAvailability(weaverse.storefront),
+      variantInfo: await fetchVariantData(weaverse.storefront),
     };
   } catch {
     return {
       heroImages: [],
       okendoStarRatingSnippet: null,
-      availability: ALL_AVAILABLE,
+      variantInfo: FALLBACK_VARIANT_INFO,
     };
   }
 };

@@ -1,11 +1,14 @@
 import {useEffect, useState} from 'react';
-import {ALL_AVAILABLE, type AvailabilityMap} from '~/lib/variantAvailability';
+import {
+  FALLBACK_VARIANT_INFO,
+  type VariantInfoMap,
+} from '~/lib/variantData';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {
   VARIANTS,
   formatPrice,
-  priceFor,
+  priceFrom,
   sellingPlanFor,
   type PackKey,
   type PurchaseMode,
@@ -14,7 +17,7 @@ import {
 type Props = {
   packKey?: PackKey;
   mode?: PurchaseMode;
-  availability?: AvailabilityMap;
+  variantInfo?: VariantInfoMap;
 };
 
 /**
@@ -27,7 +30,7 @@ type Props = {
 export function StickyAddToCart({
   packKey = 'pack10',
   mode = 'subscribe',
-  availability = ALL_AVAILABLE,
+  variantInfo = FALLBACK_VARIANT_INFO,
 }: Props) {
   const [visible, setVisible] = useState(false);
   const {open} = useAside();
@@ -42,11 +45,11 @@ export function StickyAddToCart({
   }, []);
 
   const variant = VARIANTS[packKey];
-  const {base, final} = priceFor(packKey, mode);
+  const {base, final} = priceFrom(variantInfo[packKey].price, mode);
   const sellingPlanId =
     mode === 'subscribe' ? sellingPlanFor(packKey) : undefined;
   const showStrike = mode === 'subscribe';
-  const soldOut = !availability[packKey];
+  const soldOut = !variantInfo[packKey].available;
 
   return (
     <div
