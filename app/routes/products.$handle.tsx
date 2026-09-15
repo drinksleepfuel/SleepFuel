@@ -26,6 +26,11 @@ import mocktailChamomileImage from '~/assets/mocktail-chamomile.jpg';
 import mocktailCherryImage from '~/assets/mocktail-cherry.jpg';
 import mocktailLatteImage from '~/assets/mocktail-latte.jpg';
 import {PRODUCT, VARIANTS, priceFor} from '~/lib/sleepfuelProduct';
+import {
+  ALL_AVAILABLE,
+  fetchAvailability,
+  type AvailabilityMap,
+} from '~/lib/variantAvailability';
 import {WeaverseContent} from '~/weaverse';
 
 export const meta: Route.MetaFunction = () => {
@@ -99,6 +104,7 @@ export async function loader({context, params}: Route.LoaderArgs) {
     okendoStarRatingSnippet,
     okendoReviewsSnippet,
     weaverseData,
+    availability: await fetchAvailability(context.storefront),
   };
 }
 
@@ -118,6 +124,7 @@ export default function ProductPage() {
     okendoStarRatingSnippet,
     okendoReviewsSnippet,
     weaverseData,
+    availability,
   } = useLoaderData<typeof loader>();
   const {packKey, mode} = usePurchaseState();
 
@@ -130,10 +137,15 @@ export default function ProductPage() {
           heroImages={heroImages}
           okendoStarRatingSnippet={okendoStarRatingSnippet}
           okendoReviewsSnippet={okendoReviewsSnippet}
+          availability={availability}
         />
       )}
 
-      <StickyAddToCart packKey={packKey} mode={mode} />
+      <StickyAddToCart
+        packKey={packKey}
+        mode={mode}
+        availability={availability}
+      />
 
       <Analytics.ProductView
         data={{
@@ -163,16 +175,19 @@ function CodeRenderedSections({
   heroImages,
   okendoStarRatingSnippet,
   okendoReviewsSnippet,
+  availability = ALL_AVAILABLE,
 }: {
   heroImages: HeroImage[];
   okendoStarRatingSnippet: ReviewSnippet;
   okendoReviewsSnippet: ReviewSnippet;
+  availability?: AvailabilityMap;
 }) {
   return (
     <>
       <Hero
         heroImages={heroImages}
         okendoStarRatingSnippet={okendoStarRatingSnippet}
+        availability={availability}
         heading={PRODUCT.title}
         tagline={PRODUCT.tagline}
         sizeLegend="Choose your size"

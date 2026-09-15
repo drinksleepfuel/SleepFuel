@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {ALL_AVAILABLE, type AvailabilityMap} from '~/lib/variantAvailability';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {
@@ -13,6 +14,7 @@ import {
 type Props = {
   packKey?: PackKey;
   mode?: PurchaseMode;
+  availability?: AvailabilityMap;
 };
 
 /**
@@ -25,6 +27,7 @@ type Props = {
 export function StickyAddToCart({
   packKey = 'pack10',
   mode = 'subscribe',
+  availability = ALL_AVAILABLE,
 }: Props) {
   const [visible, setVisible] = useState(false);
   const {open} = useAside();
@@ -43,6 +46,7 @@ export function StickyAddToCart({
   const sellingPlanId =
     mode === 'subscribe' ? sellingPlanFor(packKey) : undefined;
   const showStrike = mode === 'subscribe';
+  const soldOut = !availability[packKey];
 
   return (
     <div
@@ -94,20 +98,30 @@ export function StickyAddToCart({
               )}
               {formatPrice(final)}
             </div>
-            <AddToCartButton
-              analytics={{type: 'sticky-cta', packKey, mode}}
-              lines={[
-                {
-                  merchandiseId: variant.merchandiseId,
-                  quantity: 1,
-                  ...(sellingPlanId ? {sellingPlanId} : {}),
-                },
-              ]}
-              onClick={() => open('cart')}
-              className="btn-blue px-5 py-2.5 text-sm"
-            >
-              Add to Cart
-            </AddToCartButton>
+            {soldOut ? (
+              <button
+                type="button"
+                disabled
+                className="btn-blue px-5 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Sold out
+              </button>
+            ) : (
+              <AddToCartButton
+                analytics={{type: 'sticky-cta', packKey, mode}}
+                lines={[
+                  {
+                    merchandiseId: variant.merchandiseId,
+                    quantity: 1,
+                    ...(sellingPlanId ? {sellingPlanId} : {}),
+                  },
+                ]}
+                onClick={() => open('cart')}
+                className="btn-blue px-5 py-2.5 text-sm"
+              >
+                Add to Cart
+              </AddToCartButton>
+            )}
           </div>
         </div>
       </div>

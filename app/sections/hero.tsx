@@ -8,6 +8,11 @@ import {OkendoStarRating} from '@okendo/shopify-hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {usePurchaseState} from '~/lib/purchaseState';
+import {
+  ALL_AVAILABLE,
+  fetchAvailability,
+  type AvailabilityMap,
+} from '~/lib/variantAvailability';
 import heroImage from '~/assets/hero.jpg';
 import heroVideo from '~/assets/hero-video.mp4';
 import {
@@ -27,6 +32,7 @@ export type ReviewSnippet = {value: string} | null;
 type HeroProps = Partial<HydrogenComponentProps> & {
   heroImages?: HeroImage[];
   okendoStarRatingSnippet?: ReviewSnippet;
+  availability?: AvailabilityMap;
   heading?: string;
   tagline?: string;
   sizeLegend?: string;
@@ -55,6 +61,7 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
   {
     heroImages,
     okendoStarRatingSnippet,
+    availability,
     heading,
     tagline,
     sizeLegend,
@@ -75,6 +82,8 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
   const images = heroImages ?? loaderData?.heroImages ?? [];
   const starSnippet =
     okendoStarRatingSnippet ?? loaderData?.okendoStarRatingSnippet ?? null;
+  const available = availability ?? loaderData?.availability ?? ALL_AVAILABLE;
+  const packSoldOut = !available[packKey];
   const {open} = useAside();
   const variant = VARIANTS[packKey];
   const {base, final} = priceFor(packKey, mode);
@@ -122,6 +131,7 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
                 const p = priceFor(k, mode);
                 const selected = packKey === k;
                 const recommended = k === BEST_VALUE_KEY;
+                const soldOut = !available[k];
                 return (
                   <button
                     key={k}
@@ -132,11 +142,16 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
                       selected
                         ? 'border-[color:var(--color-ink)] ring-1 ring-[color:var(--color-ink)]'
                         : 'border-[color:var(--color-border)] hover:border-[color:var(--color-muted)]'
-                    }`}
+                    }${soldOut ? ' opacity-55' : ''}`}
                   >
-                    {recommended && (
+                    {recommended && !soldOut && (
                       <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[color:var(--color-blue)] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white">
                         Best value
+                      </span>
+                    )}
+                    {soldOut && (
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[color:var(--color-muted)] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white">
+                        Sold out
                       </span>
                     )}
                     <span className="block text-sm font-semibold">
@@ -209,26 +224,36 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
 
           {/* Add to cart */}
           <div className="mt-6 flex justify-center">
-            <AddToCartButton
-              analytics={{type: 'hero-cta', packKey, mode}}
-              lines={[
-                {
-                  merchandiseId: variant.merchandiseId,
-                  quantity: 1,
-                  ...(sellingPlanId ? {sellingPlanId} : {}),
-                },
-              ]}
-              onClick={() => open('cart')}
-              className="btn-blue px-8 text-base"
-            >
-              {ctaPrefix}{' '}
-              {showStrike && (
-                <span className="ml-1 text-white/60 line-through">
-                  {formatPrice(base)}
-                </span>
-              )}{' '}
-              {formatPrice(final)}
-            </AddToCartButton>
+            {packSoldOut ? (
+              <button
+                type="button"
+                disabled
+                className="btn-blue px-8 text-base disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Sold out
+              </button>
+            ) : (
+              <AddToCartButton
+                analytics={{type: 'hero-cta', packKey, mode}}
+                lines={[
+                  {
+                    merchandiseId: variant.merchandiseId,
+                    quantity: 1,
+                    ...(sellingPlanId ? {sellingPlanId} : {}),
+                  },
+                ]}
+                onClick={() => open('cart')}
+                className="btn-blue px-8 text-base"
+              >
+                {ctaPrefix}{' '}
+                {showStrike && (
+                  <span className="ml-1 text-white/60 line-through">
+                    {formatPrice(base)}
+                  </span>
+                )}{' '}
+                {formatPrice(final)}
+              </AddToCartButton>
+            )}
           </div>
 
           <ul className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-[color:var(--color-muted)]">
@@ -342,9 +367,14 @@ export const loader = async ({weaverse}: ComponentLoaderArgs) => {
         .filter((node) => Boolean(node?.url))
         .map((node) => ({url: node.url, altText: node.altText ?? ''})),
       okendoStarRatingSnippet: product?.okendoStarRatingSnippet ?? null,
+      availability: await fetchAvailability(weaverse.storefront),
     };
   } catch {
-    return {heroImages: [], okendoStarRatingSnippet: null};
+    return {
+      heroImages: [],
+      okendoStarRatingSnippet: null,
+      availability: ALL_AVAILABLE,
+    };
   }
 };
 
