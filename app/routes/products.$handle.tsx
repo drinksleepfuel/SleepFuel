@@ -423,7 +423,7 @@ const FAQS: Array<{q: string; a: string}> = [
 type Mocktail = {
   name: string;
   description: string;
-  href: string; // full recipe lives on the blog
+  href: string; // empty until the recipe post exists on the blog
   image?: string;
   imageAlt?: string;
 };
@@ -433,7 +433,7 @@ const MOCKTAILS: Mocktail[] = [
     name: 'Tart Cherry Sleep Cooler',
     description:
       'A crisp berry-forward sipper — tart cherry juice is nature’s melatonin, doubled up with SleepFuel.',
-    href: '/blogs/recipes/tart-cherry-sleep-cooler',
+    href: '',
     image: mocktailCherryImage,
     imageAlt: 'A calming SleepFuel berry smoothie in a glass',
   },
@@ -441,7 +441,7 @@ const MOCKTAILS: Mocktail[] = [
     name: 'Chamomile Moon Sipper',
     description:
       'Herbal and warm on the palate, cool in the glass — for the nights that ask you to slow down.',
-    href: '/blogs/recipes/chamomile-moon-sipper',
+    href: '',
     image: mocktailChamomileImage,
     imageAlt:
       'A SleepFuel chamomile mocktail splashing in a glass with fresh berries',
@@ -450,7 +450,7 @@ const MOCKTAILS: Mocktail[] = [
     name: 'Golden Slumber Latte',
     description:
       'A creamy, warm-spiced wind-down. Serve gently warm on cold nights or over ice when it’s mild.',
-    href: '/blogs/recipes/golden-slumber-latte',
+    href: '',
     image: mocktailLatteImage,
     imageAlt:
       'A tall glass of iced SleepFuel mocktail with strawberries, blackberries, and eucalyptus',

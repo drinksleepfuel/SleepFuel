@@ -4,8 +4,23 @@
     {
       "name": "hydrogen-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3000
+    },
+    {
+      "name": "hydrogen-dev-3456",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3456"
+      ],
+      "port": 3456
     }
   ]
 }
