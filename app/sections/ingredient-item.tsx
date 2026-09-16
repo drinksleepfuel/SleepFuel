@@ -16,7 +16,7 @@ const IngredientItem = forwardRef<HTMLDivElement, IngredientItemProps>(
 
     return (
       <div ref={ref} {...rest} className="flex gap-4">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#eae3da] text-[color:var(--color-ink)]">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#6170bb] text-white">
           <Icon className="h-[22px] w-[22px]" />
         </span>
         <div>
