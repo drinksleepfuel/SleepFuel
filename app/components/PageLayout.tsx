@@ -58,10 +58,13 @@ export function PageLayout({
           the content rather than on it. At sm+ the header is sticky in flow
           and needs no allowance.
 
-          pt-18 is 4.5rem = 72px, matching --header-height. Written as a
-          standard utility because arbitrary values carrying a var() do not
-          compile in this setup. */}
-      <main className="grow min-h-[60vh] overflow-x-hidden pt-18 sm:pt-0">
+          pt-20 is 5rem = 80px. The header's own height is 72px, but it is
+          pinned at top-12 (48px) while the ticker above it is only 45px tall,
+          so clearing it needs 48 + 72 - 45 = 75px. 80px leaves a small buffer
+          rather than sitting exactly flush, since the ticker's height depends
+          on the loaded font. Written as a standard utility because arbitrary
+          values carrying a var() do not compile in this setup. */}
+      <main className="grow min-h-[60vh] overflow-x-hidden pt-20 sm:pt-0">
         {children}
       </main>
         <Footer
