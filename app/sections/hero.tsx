@@ -4,8 +4,9 @@ import {
   type ComponentLoaderArgs,
   type HydrogenComponentProps,
 } from '@weaverse/hydrogen';
-import {OkendoStarRating} from '@okendo/shopify-hydrogen';
 import {AddToCartButton} from '~/components/AddToCartButton';
+import {Stars, formatCount} from '~/components/Stars';
+import reviewsData from '~/data/reviews.json';
 import {useAside} from '~/components/Aside';
 import {usePurchaseState} from '~/lib/purchaseState';
 import {
@@ -26,12 +27,14 @@ import {
   sellingPlanFor,
 } from '~/lib/sleepfuelProduct';
 
+const REVIEW_AVERAGE = reviewsData.average;
+const REVIEW_TOTAL = reviewsData.total;
+
 export type HeroImage = {url: string; altText: string};
 export type ReviewSnippet = {value: string} | null;
 
 type HeroProps = Partial<HydrogenComponentProps> & {
   heroImages?: HeroImage[];
-  okendoStarRatingSnippet?: ReviewSnippet;
   variantInfo?: VariantInfoMap;
   heading?: string;
   tagline?: string;
@@ -45,7 +48,6 @@ type HeroProps = Partial<HydrogenComponentProps> & {
   badgeTwo?: string;
   loaderData?: {
     heroImages: HeroImage[];
-    okendoStarRatingSnippet: ReviewSnippet;
   };
 };
 
@@ -60,7 +62,6 @@ type HeroProps = Partial<HydrogenComponentProps> & {
 const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
   {
     heroImages,
-    okendoStarRatingSnippet,
     variantInfo,
     heading,
     tagline,
@@ -80,8 +81,6 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
 ) {
   const {packKey, setPackKey, mode, setMode} = usePurchaseState();
   const images = heroImages ?? loaderData?.heroImages ?? [];
-  const starSnippet =
-    okendoStarRatingSnippet ?? loaderData?.okendoStarRatingSnippet ?? null;
   // Live Shopify price and stock; falls back to the bundled constants.
   const info = variantInfo ?? loaderData?.variantInfo ?? FALLBACK_VARIANT_INFO;
   const packSoldOut = !info[packKey].available;
@@ -114,12 +113,19 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
             {tagline}
           </p>
 
-          {/* Okendo star badge — links to the full reviews widget below. */}
-          <OkendoStarRating
-            className="mt-4"
-            productId={PRODUCT.id}
-            okendoStarRatingSnippet={starSnippet}
-          />
+          {/* Rating summary from app/data/reviews.json, linking to the full
+              list below. Replaces the Okendo badge, which rendered empty
+              because the product carries no Okendo reviews. */}
+          <a
+            href="#reviews"
+            className="mt-4 inline-flex items-center gap-2 text-sm text-[color:var(--color-muted)] outline-none hover:text-[color:var(--color-ink)] focus-visible:text-[color:var(--color-blue)]"
+          >
+            <Stars rating={REVIEW_AVERAGE} size={16} />
+            <span className="font-medium text-[color:var(--color-ink)]">
+              {REVIEW_AVERAGE.toFixed(1)}
+            </span>
+            <span>({formatCount(REVIEW_TOTAL)} reviews)</span>
+          </a>
 
           {/* Pack selector */}
           <fieldset className="mt-8">
@@ -343,9 +349,6 @@ const HERO_QUERY = `#graphql
           altText
         }
       }
-      okendoStarRatingSnippet: metafield(namespace: "okendo", key: "StarRatingSnippet") {
-        value
-      }
     }
   }
 ` as const;
@@ -359,7 +362,6 @@ export const loader = async ({weaverse}: ComponentLoaderArgs) => {
     const {product} = await weaverse.storefront.query<{
       product?: {
         images: {nodes: Array<{url: string; altText: string | null}>};
-        okendoStarRatingSnippet: ReviewSnippet;
       } | null;
     }>(HERO_QUERY, {variables: {handle: PRODUCT.handle}});
 
@@ -367,13 +369,11 @@ export const loader = async ({weaverse}: ComponentLoaderArgs) => {
       heroImages: (product?.images?.nodes ?? [])
         .filter((node) => Boolean(node?.url))
         .map((node) => ({url: node.url, altText: node.altText ?? ''})),
-      okendoStarRatingSnippet: product?.okendoStarRatingSnippet ?? null,
       variantInfo: await fetchVariantData(weaverse.storefront),
     };
   } catch {
     return {
       heroImages: [],
-      okendoStarRatingSnippet: null,
       variantInfo: FALLBACK_VARIANT_INFO,
     };
   }

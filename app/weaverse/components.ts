@@ -8,7 +8,7 @@ import * as FormulaScience from '~/sections/formula-science';
 import * as IngredientItem from '~/sections/ingredient-item';
 import * as UgcSection from '~/sections/ugc';
 import * as UgcCard from '~/sections/ugc-card';
-import * as OkendoReviewsSection from '~/sections/okendo-reviews';
+import * as ReviewsSection from '~/sections/reviews';
 import * as FAQSection from '~/sections/faq';
 import * as FAQItem from '~/sections/faq-item';
 import * as MocktailsSection from '~/sections/mocktails';
@@ -33,7 +33,7 @@ export const components: HydrogenComponent[] = [
   IngredientItem,
   UgcSection,
   UgcCard,
-  OkendoReviewsSection,
+  ReviewsSection,
   FAQSection,
   FAQItem,
   MocktailsSection,

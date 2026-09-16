@@ -16,7 +16,7 @@ import CompetitorSection from '~/sections/competitor';
 import CompetitorRow from '~/sections/competitor-row';
 import UgcSection from '~/sections/ugc';
 import UgcCard, {type UgcTone} from '~/sections/ugc-card';
-import OkendoReviewsSection from '~/sections/okendo-reviews';
+import ReviewsSection from '~/sections/reviews';
 import {StickyAddToCart} from '~/components/StickyAddToCart';
 import {usePurchaseState} from '~/lib/purchaseState';
 import featureCounterImage from '~/assets/feature-counter.jpg';
@@ -56,35 +56,23 @@ const PRODUCT_PAGE_QUERY = `#graphql
           altText
         }
       }
-      okendoStarRatingSnippet: metafield(namespace: "okendo", key: "StarRatingSnippet") {
-        value
-      }
-      okendoReviewsSnippet: metafield(namespace: "okendo", key: "ReviewsWidgetSnippet") {
-        value
-      }
     }
   }
 ` as const;
 
 export async function loader({context, params}: Route.LoaderArgs) {
   let heroImages: HeroImage[] = [];
-  let okendoStarRatingSnippet: ReviewSnippet = null;
-  let okendoReviewsSnippet: ReviewSnippet = null;
 
   try {
     const {product} = await context.storefront.query<{
       product?: {
         images: {nodes: Array<{url: string; altText: string | null}>};
-        okendoStarRatingSnippet: {value: string} | null;
-        okendoReviewsSnippet: {value: string} | null;
       } | null;
     }>(PRODUCT_PAGE_QUERY, {variables: {handle: PRODUCT.handle}});
 
     heroImages = (product?.images?.nodes ?? [])
       .filter((node) => Boolean(node?.url))
       .map((node) => ({url: node.url, altText: node.altText ?? ''}));
-    okendoStarRatingSnippet = product?.okendoStarRatingSnippet ?? null;
-    okendoReviewsSnippet = product?.okendoReviewsSnippet ?? null;
   } catch {
     // Product data is non-critical — fall back to bundled hero + no reviews.
     heroImages = [];
@@ -101,8 +89,6 @@ export async function loader({context, params}: Route.LoaderArgs) {
 
   return {
     heroImages,
-    okendoStarRatingSnippet,
-    okendoReviewsSnippet,
     weaverseData,
     variantInfo: await fetchVariantData(context.storefront),
   };
@@ -119,13 +105,8 @@ function hasWeaversePage(data: {page?: {id?: string}} | null): boolean {
 }
 
 export default function ProductPage() {
-  const {
-    heroImages,
-    okendoStarRatingSnippet,
-    okendoReviewsSnippet,
-    weaverseData,
-    variantInfo,
-  } = useLoaderData<typeof loader>();
+  const {heroImages, weaverseData, variantInfo} =
+    useLoaderData<typeof loader>();
   const {packKey, mode} = usePurchaseState();
 
   return (
@@ -135,8 +116,6 @@ export default function ProductPage() {
       ) : (
         <CodeRenderedSections
           heroImages={heroImages}
-          okendoStarRatingSnippet={okendoStarRatingSnippet}
-          okendoReviewsSnippet={okendoReviewsSnippet}
           variantInfo={variantInfo}
         />
       )}
@@ -173,20 +152,15 @@ export default function ProductPage() {
  */
 function CodeRenderedSections({
   heroImages,
-  okendoStarRatingSnippet,
-  okendoReviewsSnippet,
   variantInfo = FALLBACK_VARIANT_INFO,
 }: {
   heroImages: HeroImage[];
-  okendoStarRatingSnippet: ReviewSnippet;
-  okendoReviewsSnippet: ReviewSnippet;
   variantInfo?: VariantInfoMap;
 }) {
   return (
     <>
       <Hero
         heroImages={heroImages}
-        okendoStarRatingSnippet={okendoStarRatingSnippet}
         variantInfo={variantInfo}
         heading={PRODUCT.title}
         tagline={PRODUCT.tagline}
@@ -250,7 +224,7 @@ function CodeRenderedSections({
           <UgcCard key={c.handle} handle={c.handle} tone={c.tone} />
         ))}
       </UgcSection>
-      <OkendoReviewsSection snippet={okendoReviewsSnippet} />
+      <ReviewsSection heading="What people are saying" />
       <FAQSection heading="Frequently asked questions">
         {FAQS.map((faq) => (
           <FAQItem key={faq.q} question={faq.q} answer={faq.a} />
@@ -427,8 +401,8 @@ const FAQS: Array<{q: string; a: string}> = [
 ];
 
 /* ============================================================
-   Okendo reviews widget — full review list from the store's Okendo
-   metafield, enhanced client-side by @okendo/shopify-hydrogen.
+   Customer reviews — rendered from the Okendo export in
+   app/data/reviews.json (see app/sections/reviews.tsx).
    ============================================================ */
 
 /* ============================================================
