@@ -31,8 +31,16 @@ const FOOTER_COLUMNS: FooterColumn[] = [
   {
     heading: 'Connect',
     links: [
-      {label: 'Instagram', to: '/'},
-      {label: 'TikTok', to: '/'},
+      {
+        label: 'Instagram',
+        to: 'https://www.instagram.com/trysleepfuel',
+        external: true,
+      },
+      {
+        label: 'TikTok',
+        to: 'https://www.tiktok.com/@trysleepfuel',
+        external: true,
+      },
     ],
   },
 ];
