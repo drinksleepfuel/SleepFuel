@@ -1,3 +1,4 @@
+import {useState, type FormEvent} from 'react';
 import {NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import logoUrl from '~/assets/logo.png';
@@ -89,26 +90,7 @@ export function Footer(_props: FooterProps) {
             <h2 className="mt-6 text-2xl leading-snug text-white/90">
               {newsletterHeading}
             </h2>
-            <form
-              className="mt-5 flex max-w-sm items-center gap-2 rounded-full border border-white/20 bg-white/5 px-2 py-1.5"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <input
-                type="email"
-                placeholder="Email address"
-                aria-label="Email address"
-                className="m-0 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-0"
-              />
-              <button
-                type="submit"
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25"
-                aria-label="Subscribe"
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <path d="M3 8h9M8 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </form>
+            <NewsletterForm />
             <p className="mt-4 text-xs text-white/45">
               We care about protecting your data. Read more in our{' '}
               <NavLink
@@ -166,5 +148,96 @@ export function Footer(_props: FooterProps) {
         </div>
       </div>
     </footer>
+  );
+}
+
+/**
+ * Footer newsletter capture. Posts to the same `/api/klaviyo-subscribe`
+ * endpoint the popup uses, tagged with its own `source` so Klaviyo can tell
+ * footer signups from popup signups.
+ */
+function NewsletterForm() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'done'>('idle');
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setStatus('submitting');
+
+    const body = new FormData();
+    body.set('step', 'email');
+    body.set('email', email);
+    body.set('source', 'SleepFuel storefront footer');
+
+    try {
+      const res = await fetch('/api/klaviyo-subscribe', {method: 'POST', body});
+      const data = (await res.json()) as {error?: string};
+      if (data.error) {
+        setError(data.error);
+        setStatus('idle');
+        return;
+      }
+      setStatus('done');
+    } catch {
+      setError('Something went wrong. Please try again.');
+      setStatus('idle');
+    }
+  }
+
+  if (status === 'done') {
+    return (
+      <p className="mt-5 max-w-sm text-sm text-white/85" role="status">
+        Thanks — check your inbox for your code.
+      </p>
+    );
+  }
+
+  return (
+    <>
+      <form
+        className="mt-5 flex max-w-sm items-center gap-2 rounded-full border border-white/20 bg-white/5 px-2 py-1.5"
+        onSubmit={(event) => {
+          void handleSubmit(event);
+        }}
+      >
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="Email address"
+          aria-label="Email address"
+          className="m-0 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-0"
+        />
+        <button
+          type="submit"
+          disabled={status === 'submitting'}
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-60"
+          aria-label="Subscribe"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
+            <path
+              d="M3 8h9M8 4l4 4-4 4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </form>
+      {error && (
+        <p className="mt-2 max-w-sm text-xs text-red-300" role="alert">
+          {error}
+        </p>
+      )}
+    </>
   );
 }

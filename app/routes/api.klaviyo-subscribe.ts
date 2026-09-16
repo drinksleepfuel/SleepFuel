@@ -63,6 +63,11 @@ export async function action({request, context}: Route.ActionArgs) {
     .trim()
     .toLowerCase();
   const phoneRaw = String(formData.get('phone') ?? '').trim();
+  // Lets Klaviyo attribute a signup to the form it came from. Falls back to
+  // the popup's original label so existing profiles stay consistent.
+  const source =
+    String(formData.get('source') ?? '').trim() ||
+    'SleepFuel storefront popup';
 
   if (step === 'email') {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -76,7 +81,7 @@ export async function action({request, context}: Route.ActionArgs) {
         data: {
           type: 'subscription',
           attributes: {
-            custom_source: 'SleepFuel storefront popup',
+            custom_source: source,
             profile: {
               data: {
                 type: 'profile',
