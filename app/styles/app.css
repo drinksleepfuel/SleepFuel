@@ -623,16 +623,14 @@ button.reset > * {
    so a `transform` here would compose alongside it and leave the element
    sitting at zero. Unlayered, so it beats the `translate-y-0` utility.
 
-   Mobile: the header is a floating pill at `top-12`, so clearing the viewport
-   means moving its own height plus that offset. Desktop: it's sticky at the
-   top edge, so -100% is enough.
+   Scoped to mobile only. The header is a floating pill at `top-12` there,
+   so clearing the viewport means moving its own height plus that offset.
+   At sm+ it is sticky at the top edge and Tailwind's `sm:-translate-y-full`
+   handles it, so this must not apply — two rules fighting over the same
+   property is what made the desktop state unpredictable.
    ============================================================ */
-.sf-header-hidden {
-  translate: 0 calc(-1 * (var(--header-height) + 4rem));
-}
-
-@media (min-width: 640px) {
+@media (max-width: 639px) {
   .sf-header-hidden {
-    translate: 0 -100%;
+    translate: 0 calc(-1 * (var(--header-height) + 4rem));
   }
 }
