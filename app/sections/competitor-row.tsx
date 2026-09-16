@@ -3,25 +3,26 @@ import {createSchema, type HydrogenComponentProps} from '@weaverse/hydrogen';
 
 type CompetitorRowProps = Partial<HydrogenComponentProps> & {
   label?: string;
+  shortLabel?: string;
   sleepfuel?: string;
   others?: string;
 };
 
 /** One comparison row inside `competitor`. */
 const CompetitorRow = forwardRef<HTMLTableRowElement, CompetitorRowProps>(
-  function CompetitorRow({label, sleepfuel, others, ...rest}, ref) {
+  function CompetitorRow({label, shortLabel, sleepfuel, others, ...rest}, ref) {
     return (
       <tr ref={ref} {...rest}>
         <th
           scope="row"
-          className="border-t border-[color:var(--color-border)] px-3 py-4 text-left font-medium text-[color:var(--color-ink)]"
+          className="border-t border-[color:var(--color-border)] px-2 py-3 text-left font-medium text-[color:var(--color-ink)] sm:px-3 sm:py-4"
         >
           {label}
         </th>
-        <td className="border-t border-white/15 px-3 py-4 text-center font-semibold text-white">
+        <td className="border-t border-white/15 px-2 py-3 text-center font-semibold text-white sm:px-3 sm:py-4">
           {sleepfuel}
         </td>
-        <td className="border-t border-[color:var(--color-border)] px-3 py-4 text-center text-[color:var(--color-muted)]">
+        <td className="border-t border-[color:var(--color-border)] px-2 py-3 text-center text-[color:var(--color-muted)] sm:px-3 sm:py-4">
           {others}
         </td>
       </tr>
@@ -39,6 +40,11 @@ export const schema = createSchema({
       group: 'Content',
       inputs: [
         {type: 'text', name: 'label', label: 'Row label'},
+        {
+          type: 'text',
+          name: 'shortLabel',
+          label: 'Short label (narrow screens, optional)',
+        },
         {type: 'text', name: 'sleepfuel', label: 'SleepFuel value'},
         {type: 'text', name: 'others', label: 'Others value'},
       ],

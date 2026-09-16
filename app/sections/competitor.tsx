@@ -53,8 +53,14 @@ const CompetitorSection = forwardRef<HTMLElement, CompetitorSectionProps>(
           {/* min-w matches the table below. Without it this wrapper sizes to
               the viewport inside `overflow-x-auto`, so the video's 34%/33%
               resolves against a narrower box than the columns and drifts out
-              of alignment on mobile. */}
-          <div className="relative min-w-[560px]">
+              of alignment on mobile.
+
+              Scoped to sm+: the content only needs ~406px flat, so on a phone
+              the table fits the viewport once labels wrap, and forcing 560px
+              there just cut the "Others" column off behind a side-scroll. The
+              column widths stay percentage-based, so the video tracks them at
+              any width. */}
+          <div className="relative sm:min-w-[560px]">
             <video
               src={imageUrl(
                 backgroundVideo ?? null,
@@ -69,7 +75,7 @@ const CompetitorSection = forwardRef<HTMLElement, CompetitorSectionProps>(
               className="pointer-events-none absolute inset-y-0 left-[34%] z-0 h-full w-[33%] overflow-hidden rounded-2xl object-cover"
               style={{filter: 'brightness(0.8)'}}
             />
-            <table className="relative z-10 w-full min-w-[560px] border-separate border-spacing-0 text-sm">
+            <table className="relative z-10 w-full border-separate border-spacing-0 text-xs sm:min-w-[560px] sm:text-sm">
               <colgroup>
                 <col style={{width: '34%'}} />
                 <col style={{width: '33%'}} />
@@ -79,19 +85,19 @@ const CompetitorSection = forwardRef<HTMLElement, CompetitorSectionProps>(
                 <tr>
                   <th
                     scope="col"
-                    className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]"
+                    className="px-2 py-3 text-left text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)] sm:px-3 sm:py-4"
                   >
                     <span className="sr-only">Category</span>
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-4 text-center text-base font-semibold text-white"
+                    className="px-2 py-3 text-center text-sm font-semibold text-white sm:px-3 sm:py-4 sm:text-base"
                   >
                     {ourLabel}
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-4 text-center text-sm font-medium text-[color:var(--color-ink)]"
+                    className="px-2 py-3 text-center text-xs font-medium text-[color:var(--color-ink)] sm:px-3 sm:py-4 sm:text-sm"
                   >
                     {theirLabel}
                   </th>
