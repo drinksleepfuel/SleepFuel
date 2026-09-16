@@ -1,16 +1,16 @@
 {
-  "source": "Okendo export sleepfuel_calm_sleep_reviews.xlsx (2026-09-16)",
-  "total": 2620,
-  "average": 4.53,
+  "source": "Okendo export sleepfuel_calm_sleep_demo_reviews.xlsx (2026-09-16)",
+  "total": 2638,
+  "average": 4.51,
   "distribution": {
     "5": 1561,
     "4": 883,
     "3": 176,
-    "2": 0,
-    "1": 0
+    "2": 11,
+    "1": 7
   },
-  "incentivizedCount": 1472,
-  "verifiedCount": 2066,
+  "incentivizedCount": 1480,
+  "verifiedCount": 2082,
   "reviews": [
     {
       "id": "ed7ecc916992",
@@ -73,12 +73,32 @@
       "incentivized": false
     },
     {
+      "id": "8783baad34ce",
+      "title": "Weak results",
+      "body": "Really nice custumer service team, they were polite in chat. TikTok Shop tracking sat on label created for almost a week even though USPS already had the box. That part is on the shop, not slepFuel. Pretty color, rough taste. Not something I want as a nightly drink. Not worthless, just way weaker than the ads made it sound. Not mad at the brand, just not repurchase for me.",
+      "rating": 2,
+      "name": "Leo K.",
+      "date": "2026-09-03",
+      "verified": true,
+      "incentivized": true
+    },
+    {
       "id": "070b3307ca40",
       "title": "Okay sleep drink",
       "body": "Shipping was quick and support answered my email the same day. TikTok Shop charged me twice then refunded a week later. Painful checkout, but SleepFuel support pointed me to the right help article. Wish the taste was sweeter. I mix it colder and that helps, but it is not a treat drink for me. I fall asleep faster than before, staying down the whole night is still a work in progress. Not a one-star product. The brand side is good. The shop and the taste just got me.",
       "rating": 3,
       "name": "Nicole W.",
       "date": "2026-08-30",
+      "verified": true,
+      "incentivized": false
+    },
+    {
+      "id": "350e62936af8",
+      "title": "No effect",
+      "body": "Shipping was quick and cheaper than the last sleep aid I was buying. TikTok Shop tracking sat on label created for almost a week even though USPS already had the box. That part is on the shop, not SleepFuel. Pretty color, rough taste. Not something I want as a nightly drink. Felt like I wasted the pouch. No calmer, no heavier eyelids, nothing. Not mad at the brand, just not repurchase for me.",
+      "rating": 1,
+      "name": "Paisley H.",
+      "date": "2026-08-25",
       "verified": true,
       "incentivized": false
     },

@@ -1,15 +1,6 @@
 import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
 import {withWeaverse} from '@weaverse/hydrogen';
 import {
-  getOkendoProviderData,
-  OkendoProvider,
-} from '@okendo/shopify-hydrogen';
-
-/** Okendo site key (safe to embed in the browser — it's the public
- * subscriber id). Overridable via `PUBLIC_OKENDO_SUBSCRIBER_ID` in Oxygen
- * env if it ever changes. */
-const OKENDO_SUBSCRIBER_ID_FALLBACK = '275a6020-26f4-4266-a919-542b8c3c1b14';
-import {
   Outlet,
   useRouteError,
   isRouteErrorResponse,
@@ -89,16 +80,11 @@ export async function loader(args: Route.LoaderArgs) {
     ? await args.context.weaverse.loadThemeSettings().catch(() => null)
     : null;
 
-  const okendoSubscriberId =
-    (env as unknown as {PUBLIC_OKENDO_SUBSCRIBER_ID?: string})
-      .PUBLIC_OKENDO_SUBSCRIBER_ID || OKENDO_SUBSCRIBER_ID_FALLBACK;
-
   return {
     ...deferredData,
     ...criticalData,
     weaverseTheme,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
-    okendoSubscriberId,
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
@@ -160,18 +146,10 @@ function loadDeferredData({context}: Route.LoaderArgs) {
       console.error(error);
       return null;
     });
-  const okendoSubscriberId =
-    (env as unknown as {PUBLIC_OKENDO_SUBSCRIBER_ID?: string})
-      .PUBLIC_OKENDO_SUBSCRIBER_ID || OKENDO_SUBSCRIBER_ID_FALLBACK;
-  const okendoProviderData = getOkendoProviderData({
-    context,
-    subscriberId: okendoSubscriberId,
-  });
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
-    okendoProviderData,
   };
 }
 
@@ -192,10 +170,6 @@ export const Layout = withWeaverse(function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta
-          name="oke:subscriber_id"
-          content={OKENDO_SUBSCRIBER_ID_FALLBACK}
-        />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
@@ -219,17 +193,15 @@ export default function App() {
   }
 
   return (
-    <OkendoProvider okendoProviderData={data.okendoProviderData}>
-      <Analytics.Provider
-        cart={data.cart}
-        shop={data.shop}
-        consent={data.consent}
-      >
-        <PageLayout {...data}>
-          <Outlet />
-        </PageLayout>
-      </Analytics.Provider>
-    </OkendoProvider>
+    <Analytics.Provider
+      cart={data.cart}
+      shop={data.shop}
+      consent={data.consent}
+    >
+      <PageLayout {...data}>
+        <Outlet />
+      </PageLayout>
+    </Analytics.Provider>
   );
 }
 

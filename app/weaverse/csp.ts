@@ -7,9 +7,9 @@ type CspDirectives = Record<string, string[] | string | boolean>;
  * inside its editor iframe.
  *
  * This returns *only* the Weaverse additions. Callers are expected to merge it
- * with the storefront's own directives (see `mergeCsp` and the Okendo
- * allow-list in `app/entry.server.tsx`) — returning a complete policy here
- * would silently clobber those hosts and break the reviews widget.
+ * with any directives the storefront declares of its own (see `mergeCsp` in
+ * `app/entry.server.tsx`) — returning a complete policy here would silently
+ * clobber those hosts.
  */
 export function getWeaverseCsp(
   request: Request,
@@ -32,9 +32,9 @@ export function getWeaverseCsp(
   //
   // Naming a directive that did not previously exist is what breaks this
   // storefront: everything currently relies on falling back to `default-src`,
-  // which carries the Okendo hosts. Declaring `scriptSrc` or `imgSrc` here —
-  // even with `'self'` — cancels that fallback and silently blocks the reviews
-  // widget and the bundled assets. Weaverse's own hosts resolve fine through
+  // which carries the storefront's own hosts. Declaring `scriptSrc` or
+  // `imgSrc` here — even with `'self'` — cancels that fallback and silently
+  // blocks bundled assets. Weaverse's own hosts resolve fine through
   // `default-src`, so it does not need its own script/img directives.
   const directives: CspDirectives = {
     defaultSrc: [

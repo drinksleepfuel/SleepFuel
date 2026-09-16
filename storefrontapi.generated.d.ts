@@ -395,6 +395,22 @@ export type FooterQuery = {
   >;
 };
 
+export type VariantDataQueryVariables = StorefrontAPI.Exact<{
+  ids:
+    | Array<StorefrontAPI.Scalars['ID']['input']>
+    | StorefrontAPI.Scalars['ID']['input'];
+}>;
+
+export type VariantDataQuery = {
+  nodes: Array<
+    StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+        price: Pick<StorefrontAPI.MoneyV2, 'amount'>;
+      }
+    >
+  >;
+};
+
 export type ArticleQueryVariables = StorefrontAPI.Exact<{
   articleHandle: StorefrontAPI.Scalars['String']['input'];
   blogHandle: StorefrontAPI.Scalars['String']['input'];
@@ -772,12 +788,6 @@ export type ProductPageQuery = {
       images: {
         nodes: Array<Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText'>>;
       };
-      okendoStarRatingSnippet?: StorefrontAPI.Maybe<
-        Pick<StorefrontAPI.Metafield, 'value'>
-      >;
-      okendoReviewsSnippet?: StorefrontAPI.Maybe<
-        Pick<StorefrontAPI.Metafield, 'value'>
-      >;
     }
   >;
 };
@@ -1009,21 +1019,6 @@ export type HeroProductQueryVariables = StorefrontAPI.Exact<{
 export type HeroProductQuery = {
   product?: StorefrontAPI.Maybe<{
     images: {nodes: Array<Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText'>>};
-    okendoStarRatingSnippet?: StorefrontAPI.Maybe<
-      Pick<StorefrontAPI.Metafield, 'value'>
-    >;
-  }>;
-};
-
-export type OkendoReviewsSnippetQueryVariables = StorefrontAPI.Exact<{
-  handle: StorefrontAPI.Scalars['String']['input'];
-}>;
-
-export type OkendoReviewsSnippetQuery = {
-  product?: StorefrontAPI.Maybe<{
-    okendoReviewsSnippet?: StorefrontAPI.Maybe<
-      Pick<StorefrontAPI.Metafield, 'value'>
-    >;
   }>;
 };
 
@@ -1035,6 +1030,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query Footer(\n    $country: CountryCode\n    $footerMenuHandle: String!\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    menu(handle: $footerMenuHandle) {\n      ...Menu\n    }\n  }\n  #graphql\n  fragment MenuItem on MenuItem {\n    id\n    resourceId\n    tags\n    title\n    type\n    url\n  }\n  fragment ChildMenuItem on MenuItem {\n    ...MenuItem\n  }\n  fragment ParentMenuItem on MenuItem {\n    ...MenuItem\n    items {\n      ...ChildMenuItem\n    }\n  }\n  fragment Menu on Menu {\n    id\n    items {\n      ...ParentMenuItem\n    }\n  }\n\n': {
     return: FooterQuery;
     variables: FooterQueryVariables;
+  };
+  '#graphql\n  query VariantData($ids: [ID!]!) {\n    nodes(ids: $ids) {\n      ... on ProductVariant {\n        id\n        availableForSale\n        price {\n          amount\n        }\n      }\n    }\n  }\n': {
+    return: VariantDataQuery;
+    variables: VariantDataQueryVariables;
   };
   '#graphql\n  query Article(\n    $articleHandle: String!\n    $blogHandle: String!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    blog(handle: $blogHandle) {\n      handle\n      articleByHandle(handle: $articleHandle) {\n        handle\n        title\n        contentHtml\n        publishedAt\n        author: authorV2 {\n          name\n        }\n        image {\n          id\n          altText\n          url\n          width\n          height\n        }\n        seo {\n          description\n          title\n        }\n      }\n    }\n  }\n': {
     return: ArticleQuery;
@@ -1072,7 +1071,7 @@ interface GeneratedQueryTypes {
     return: PoliciesQuery;
     variables: PoliciesQueryVariables;
   };
-  '#graphql\n  query ProductPage($handle: String!, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      id\n      title\n      images(first: 12) {\n        nodes {\n          id\n          url\n          altText\n        }\n      }\n      okendoStarRatingSnippet: metafield(namespace: "okendo", key: "StarRatingSnippet") {\n        value\n      }\n      okendoReviewsSnippet: metafield(namespace: "okendo", key: "ReviewsWidgetSnippet") {\n        value\n      }\n    }\n  }\n': {
+  '#graphql\n  query ProductPage($handle: String!, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      id\n      title\n      images(first: 12) {\n        nodes {\n          id\n          url\n          altText\n        }\n      }\n    }\n  }\n': {
     return: ProductPageQuery;
     variables: ProductPageQueryVariables;
   };
@@ -1084,13 +1083,9 @@ interface GeneratedQueryTypes {
     return: PredictiveSearchQuery;
     variables: PredictiveSearchQueryVariables;
   };
-  '#graphql\n  query HeroProduct($handle: String!, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      images(first: 12) {\n        nodes {\n          id\n          url\n          altText\n        }\n      }\n      okendoStarRatingSnippet: metafield(namespace: "okendo", key: "StarRatingSnippet") {\n        value\n      }\n    }\n  }\n': {
+  '#graphql\n  query HeroProduct($handle: String!, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      images(first: 12) {\n        nodes {\n          id\n          url\n          altText\n        }\n      }\n    }\n  }\n': {
     return: HeroProductQuery;
     variables: HeroProductQueryVariables;
-  };
-  '#graphql\n  query OkendoReviewsSnippet($handle: String!) {\n    product(handle: $handle) {\n      okendoReviewsSnippet: metafield(namespace: "okendo", key: "ReviewsWidgetSnippet") {\n        value\n      }\n    }\n  }\n': {
-    return: OkendoReviewsSnippetQuery;
-    variables: OkendoReviewsSnippetQueryVariables;
   };
 }
 

@@ -14,7 +14,6 @@
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
-    "@okendo/shopify-hydrogen": "^2.6.2",
     "@shopify/hydrogen": "2026.4.2",
     "@weaverse/hydrogen": "^5.21.0",
     "graphql": "^16.10.0",

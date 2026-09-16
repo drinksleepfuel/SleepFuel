@@ -114,8 +114,7 @@ const Hero = forwardRef<HTMLElement, HeroProps>(function Hero(
           </p>
 
           {/* Rating summary from app/data/reviews.json, linking to the full
-              list below. Replaces the Okendo badge, which rendered empty
-              because the product carries no Okendo reviews. */}
+              list below. */}
           <a
             href="#reviews"
             className="mt-4 inline-flex items-center gap-2 text-sm text-[color:var(--color-muted)] outline-none hover:text-[color:var(--color-ink)] focus-visible:text-[color:var(--color-blue)]"

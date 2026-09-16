@@ -26,7 +26,7 @@ type ReviewsSectionProps = Partial<HydrogenComponentProps> & {
 };
 
 /**
- * Customer reviews, rendered from the Okendo export in `app/data/reviews.json`.
+ * Customer reviews, rendered from `app/data/reviews.json`.
  *
  * The headline average and count cover every approved review in that export;
  * the cards are a sample kept proportional to the real rating mix, so the page

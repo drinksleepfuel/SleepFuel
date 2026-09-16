@@ -401,8 +401,8 @@ const FAQS: Array<{q: string; a: string}> = [
 ];
 
 /* ============================================================
-   Customer reviews — rendered from the Okendo export in
-   app/data/reviews.json (see app/sections/reviews.tsx).
+   Customer reviews — rendered from app/data/reviews.json
+   (see app/sections/reviews.tsx).
    ============================================================ */
 
 /* ============================================================
