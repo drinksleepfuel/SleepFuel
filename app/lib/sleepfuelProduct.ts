@@ -55,8 +55,14 @@ export const VARIANTS: Record<PackKey, Variant> = {
 /** Order of the tiers as shown in the selector. */
 export const PACK_ORDER: PackKey[] = ['pack10', 'pack20', 'pack30'];
 
-/** Tier to highlight with a "Best value" badge (lowest cost per night). */
-export const BEST_VALUE_KEY: PackKey = 'pack20';
+/**
+ * Tier to highlight with a "Best value" badge (lowest cost per night).
+ *
+ * At Shopify's current prices the 30-night is $2.12/night against the
+ * 20-night's $2.34, so the badge belongs on pack30. Re-check this if the
+ * per-pack pricing changes.
+ */
+export const BEST_VALUE_KEY: PackKey = 'pack30';
 
 /**
  * Shopify Subscriptions selling plan GIDs — one per product. Empty until the
