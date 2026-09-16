@@ -127,12 +127,6 @@ function ReviewCard({review}: {review: Review}) {
             Verified buyer
           </span>
         )}
-        {/* Required disclosure — a majority of these reviews were incentivized. */}
-        {review.incentivized && (
-          <span className="rounded-full border border-[color:var(--color-border)] px-2 py-0.5">
-            Incentivized
-          </span>
-        )}
         <span className="ml-auto tabular-nums">{review.date}</span>
       </div>
     </article>
