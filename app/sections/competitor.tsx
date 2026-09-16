@@ -50,7 +50,11 @@ const CompetitorSection = forwardRef<HTMLElement, CompetitorSectionProps>(
         </div>
 
         <div className="mt-10 overflow-x-auto">
-          <div className="relative">
+          {/* min-w matches the table below. Without it this wrapper sizes to
+              the viewport inside `overflow-x-auto`, so the video's 34%/33%
+              resolves against a narrower box than the columns and drifts out
+              of alignment on mobile. */}
+          <div className="relative min-w-[560px]">
             <video
               src={imageUrl(
                 backgroundVideo ?? null,

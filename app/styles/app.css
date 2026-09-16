@@ -609,3 +609,30 @@ button.reset > * {
 @media (prefers-reduced-motion: reduce) {
   .sf-cell-video { animation: none; }
 }
+
+/* ============================================================
+   Header hide-on-scroll.
+
+   Written as plain CSS rather than a Tailwind arbitrary value because
+   `-translate-y-[calc(var(--header-height)+4rem)]` never generated a rule —
+   calc() needs whitespace around its operator, and the escaped forms were
+   still dropped.
+
+   Uses the `translate` property, not `transform`: Tailwind v4 implements
+   translate utilities as `translate: var(--tw-translate-x) var(--tw-translate-y)`,
+   so a `transform` here would compose alongside it and leave the element
+   sitting at zero. Unlayered, so it beats the `translate-y-0` utility.
+
+   Mobile: the header is a floating pill at `top-12`, so clearing the viewport
+   means moving its own height plus that offset. Desktop: it's sticky at the
+   top edge, so -100% is enough.
+   ============================================================ */
+.sf-header-hidden {
+  translate: 0 calc(-1 * (var(--header-height) + 4rem));
+}
+
+@media (min-width: 640px) {
+  .sf-header-hidden {
+    translate: 0 -100%;
+  }
+}
