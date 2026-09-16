@@ -626,8 +626,11 @@ button.reset > * {
    Deliberately NOT behind a media query. One offset works at both
    breakpoints: the header is 72px tall, pinned at `top-12` (48px) on mobile
    and `top-0` when sticky at sm+, so -(72px + 4rem) = -136px clears the
-   viewport either way. Overshooting on desktop is invisible, and a
-   breakpoint-split version had the two rules fighting over the same property.
+   viewport either way. Overshooting on desktop is invisible.
+
+   The component also keeps Tailwind's `sm:-translate-y-full` on the hidden
+   state. Whichever of the two the cascade resolves to at sm+, the header ends
+   up off-screen — mobile has no `sm:` rule so it always uses this one.
    ============================================================ */
 .sf-header-hidden {
   translate: 0 calc(-1 * (var(--header-height) + 4rem));
