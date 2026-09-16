@@ -613,24 +613,22 @@ button.reset > * {
 /* ============================================================
    Header hide-on-scroll.
 
-   Written as plain CSS rather than a Tailwind arbitrary value because
-   `-translate-y-[calc(var(--header-height)+4rem)]` never generated a rule —
-   calc() needs whitespace around its operator, and the escaped forms were
-   still dropped.
+   Plain CSS rather than a Tailwind arbitrary value:
+   `-translate-y-[calc(var(--header-height)+4rem)]` generated no rule at all,
+   because calc() needs whitespace around its operator and the escaped forms
+   were still dropped.
 
-   Uses the `translate` property, not `transform`: Tailwind v4 implements
-   translate utilities as `translate: var(--tw-translate-x) var(--tw-translate-y)`,
-   so a `transform` here would compose alongside it and leave the element
-   sitting at zero. Unlayered, so it beats the `translate-y-0` utility.
+   Sets `translate`, not `transform` — Tailwind v4 implements its translate
+   utilities as `translate: var(--tw-translate-x) var(--tw-translate-y)`, so a
+   `transform` here would compose alongside that and leave the header at zero.
+   Unlayered, so it beats the `translate-y-0` utility.
 
-   Scoped to mobile only. The header is a floating pill at `top-12` there,
-   so clearing the viewport means moving its own height plus that offset.
-   At sm+ it is sticky at the top edge and Tailwind's `sm:-translate-y-full`
-   handles it, so this must not apply — two rules fighting over the same
-   property is what made the desktop state unpredictable.
+   Deliberately NOT behind a media query. One offset works at both
+   breakpoints: the header is 72px tall, pinned at `top-12` (48px) on mobile
+   and `top-0` when sticky at sm+, so -(72px + 4rem) = -136px clears the
+   viewport either way. Overshooting on desktop is invisible, and a
+   breakpoint-split version had the two rules fighting over the same property.
    ============================================================ */
-@media (max-width: 639px) {
-  .sf-header-hidden {
-    translate: 0 calc(-1 * (var(--header-height) + 4rem));
-  }
+.sf-header-hidden {
+  translate: 0 calc(-1 * (var(--header-height) + 4rem));
 }
