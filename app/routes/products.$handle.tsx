@@ -121,6 +121,7 @@ export default function ProductPage() {
       )}
 
       <StickyAddToCart
+        image={heroImages[1] ?? heroImages[0] ?? null}
         packKey={packKey}
         mode={mode}
         variantInfo={variantInfo}

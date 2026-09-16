@@ -15,6 +15,8 @@ import {
 } from '~/lib/sleepfuelProduct';
 
 type Props = {
+  /** Product shot for the thumbnail — the same image the hero renders. */
+  image?: {url: string; altText?: string} | null;
   packKey?: PackKey;
   mode?: PurchaseMode;
   variantInfo?: VariantInfoMap;
@@ -28,6 +30,7 @@ type Props = {
  * out of view.
  */
 export function StickyAddToCart({
+  image = null,
   packKey = 'pack10',
   mode = 'subscribe',
   variantInfo = FALLBACK_VARIANT_INFO,
@@ -72,14 +75,26 @@ export function StickyAddToCart({
         >
           {/* Left: thumbnail + name */}
           <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="hidden h-12 w-12 shrink-0 rounded-xl sm:block"
-              style={{
-                background:
-                  'radial-gradient(120% 100% at 30% 25%, #3a4a6e 0%, #232a3f 60%, #14161f 100%)',
-              }}
-              aria-hidden="true"
-            />
+            {/* Falls back to the original gradient block when no product
+                image is available, so the bar never renders a broken thumb. */}
+            {image?.url ? (
+              <img
+                src={image.url}
+                alt=""
+                className="hidden h-12 w-12 shrink-0 rounded-xl object-cover sm:block"
+                loading="lazy"
+                aria-hidden="true"
+              />
+            ) : (
+              <div
+                className="hidden h-12 w-12 shrink-0 rounded-xl sm:block"
+                style={{
+                  background:
+                    'radial-gradient(120% 100% at 30% 25%, #3a4a6e 0%, #232a3f 60%, #14161f 100%)',
+                }}
+                aria-hidden="true"
+              />
+            )}
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-[color:var(--color-ink)]">
                 {PRODUCT_NAME}
