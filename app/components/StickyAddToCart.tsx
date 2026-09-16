@@ -79,7 +79,7 @@ export function StickyAddToCart({
                 image is available, so the bar never renders a broken thumb. */}
             {image?.url ? (
               <img
-                src={image.url}
+                src={thumbnailUrl(image.url)}
                 alt=""
                 className="hidden h-12 w-12 shrink-0 rounded-xl object-cover sm:block"
                 loading="lazy"
@@ -148,3 +148,15 @@ export function StickyAddToCart({
 }
 
 const PRODUCT_NAME = 'SleepFuel Drink Mix';
+
+/**
+ * Asks the Shopify CDN for a thumbnail-sized copy. The product shots are
+ * 1024x1024, and this renders at 48px — without a width param the bar pulls
+ * the full-size original for a thumbnail. 96px covers 2x displays.
+ *
+ * Non-Shopify URLs are returned untouched.
+ */
+function thumbnailUrl(url: string): string {
+  if (!url.includes('cdn.shopify.com')) return url;
+  return `${url}${url.includes('?') ? '&' : '?'}width=96`;
+}
