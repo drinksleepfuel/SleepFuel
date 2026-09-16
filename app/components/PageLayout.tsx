@@ -52,7 +52,18 @@ export function PageLayout({
           isLoggedIn={isLoggedIn}
           publicStoreDomain={publicStoreDomain}
         />
-        <main className="grow min-h-[60vh] overflow-x-hidden">{children}</main>
+        {/* The header is a fixed floating pill on mobile, so it would sit over
+          the top of the page content — it overlapped the hero product images
+          by 76px. Reserve its height below the ticker so the nav sits above
+          the content rather than on it. At sm+ the header is sticky in flow
+          and needs no allowance.
+
+          pt-18 is 4.5rem = 72px, matching --header-height. Written as a
+          standard utility because arbitrary values carrying a var() do not
+          compile in this setup. */}
+      <main className="grow min-h-[60vh] overflow-x-hidden pt-18 sm:pt-0">
+        {children}
+      </main>
         <Footer
           footer={footer}
           header={header}
