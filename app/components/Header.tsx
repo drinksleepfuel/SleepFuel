@@ -22,9 +22,13 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
-export const NAV_LINKS = [
-  {label: 'Shop', to: '/products/sleepfuel-drink-mix'},
-];
+/**
+ * Top-level nav links. Empty by design: this is a single-product storefront
+ * and the only link, "Shop", pointed at the page the visitor is already on.
+ * The header's job is cart access. Add entries here (or via the
+ * `headerNavLinks` theme setting) if real destinations appear.
+ */
+export const NAV_LINKS: Array<{label: string; to: string}> = [];
 
 export function Header({cart, isLoggedIn}: HeaderProps) {
   const hidden = useHideOnScroll();
@@ -108,6 +112,10 @@ export function HeaderMenu({viewport}: {viewport: Viewport}) {
     viewport === 'desktop'
       ? 'hidden md:flex items-center gap-8'
       : 'flex flex-col gap-4 p-4';
+
+  // Render nothing rather than an empty <nav>, which would still occupy a
+  // slot in the header's flex row.
+  if (!navLinks.length) return null;
 
   return (
     <nav className={className} role="navigation">
