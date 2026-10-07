@@ -19,6 +19,15 @@ import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
 import {GlobalStyle} from '~/weaverse/style';
 
+/**
+ * OpenAI Ads pixel. Runs on every page from the shared <head>.
+ *
+ * Carries the CSP nonce — this storefront sends a nonce-based policy and an
+ * un-nonced inline script is silently blocked. The SDK host is allow-listed
+ * in `app/entry.server.tsx`.
+ */
+const OPENAI_ADS_PIXEL = `!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"MnUpwQGPBnAECXLsqNbGWK",debug:true});`;
+
 export type RootLoader = typeof loader;
 
 /**
@@ -170,6 +179,12 @@ export const Layout = withWeaverse(function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        {/* Kept after charset/viewport — those must come first for correct
+            document parsing — but ahead of styles and app scripts. */}
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{__html: OPENAI_ADS_PIXEL}}
+        />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
