@@ -20,13 +20,20 @@ import {PageLayout} from './components/PageLayout';
 import {GlobalStyle} from '~/weaverse/style';
 
 /**
- * OpenAI Ads pixel. Runs on every page from the shared <head>.
+ * OpenAI Ads pixel.
  *
- * Carries the CSP nonce — this storefront sends a nonce-based policy and an
- * un-nonced inline script is silently blocked. The SDK host is allow-listed
- * in `app/entry.server.tsx`.
+ * The published snippet inserts its own <script> into <head> at runtime.
+ * Inside a React-rendered document that mutates the DOM right before
+ * hydration, which produced React errors #418/#423 and dropped the page to
+ * client rendering. So the queue stub is inlined here and the SDK is rendered
+ * as a real <script> below, leaving React in control of <head>.
+ *
+ * Queue semantics are identical to the official snippet: calls made before
+ * the SDK arrives land in `oaiq.q` and are replayed on load.
  */
-const OPENAI_ADS_PIXEL = `!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"MnUpwQGPBnAECXLsqNbGWK",debug:true});`;
+const OPENAI_ADS_PIXEL_ID = 'MnUpwQGPBnAECXLsqNbGWK';
+const OPENAI_ADS_SDK = 'https://bzrcdn.openai.com/sdk/oaiq.min.js';
+const OPENAI_ADS_INIT = `!function(w){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q}(window);oaiq("init",{pixelId:"${OPENAI_ADS_PIXEL_ID}",debug:true});`;
 
 export type RootLoader = typeof loader;
 
@@ -183,8 +190,9 @@ export const Layout = withWeaverse(function RootLayout({
             document parsing — but ahead of styles and app scripts. */}
         <script
           nonce={nonce}
-          dangerouslySetInnerHTML={{__html: OPENAI_ADS_PIXEL}}
+          dangerouslySetInnerHTML={{__html: OPENAI_ADS_INIT}}
         />
+        <script nonce={nonce} async src={OPENAI_ADS_SDK} />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
