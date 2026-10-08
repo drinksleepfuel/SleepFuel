@@ -18,22 +18,30 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
 import {GlobalStyle} from '~/weaverse/style';
+import {OpenAiAdsPixel} from '~/components/OpenAiAdsPixel';
+import {OPENAI_PIXEL_ID, OPENAI_SDK_URL} from '~/lib/openAiPixel';
 
 /**
- * OpenAI Ads pixel.
+ * ChatGPT Ads measurement pixel — loader, consent default and init.
  *
- * The published snippet inserts its own <script> into <head> at runtime.
- * Inside a React-rendered document that mutates the DOM right before
- * hydration, which produced React errors #418/#423 and dropped the page to
- * client rendering. So the queue stub is inlined here and the SDK is rendered
- * as a real <script> below, leaving React in control of <head>.
+ * Rendered as markup rather than executed here, so nothing touches `window`
+ * or `document` during server rendering, and it runs exactly once per
+ * document (no remount or Strict Mode double-fire).
  *
- * Queue semantics are identical to the official snippet: calls made before
- * the SDK arrives land in `oaiq.q` and are replayed on load.
+ * Order matters. The docs state consent must be set to false *before* `init`
+ * to prevent measurement, so the pixel starts denied and
+ * `<OpenAiAdsPixel/>` opens it only once Shopify's customer privacy API says
+ * tracking is allowed.
+ *
+ * The published snippet injects its own <script> into <head> at runtime,
+ * which mutates the DOM React is about to hydrate (React #418/#423). The
+ * queue stub is inlined instead and the SDK rendered as a real <script
+ * async> below; queue semantics are unchanged — calls made before the SDK
+ * arrives land in `oaiq.q` and replay on load.
  */
-const OPENAI_ADS_PIXEL_ID = 'MnUpwQGPBnAECXLsqNbGWK';
-const OPENAI_ADS_SDK = 'https://bzrcdn.openai.com/sdk/oaiq.min.js';
-const OPENAI_ADS_INIT = `!function(w){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q}(window);oaiq("init",{pixelId:"${OPENAI_ADS_PIXEL_ID}",debug:true});`;
+const OPENAI_ADS_BOOTSTRAP = `!function(w){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q}(window);oaiq("consent",false);oaiq("init",{pixelId:${JSON.stringify(
+  OPENAI_PIXEL_ID,
+)},debug:${import.meta.env.DEV ? 'true' : 'false'}});`;
 
 export type RootLoader = typeof loader;
 
@@ -190,9 +198,9 @@ export const Layout = withWeaverse(function RootLayout({
             document parsing — but ahead of styles and app scripts. */}
         <script
           nonce={nonce}
-          dangerouslySetInnerHTML={{__html: OPENAI_ADS_INIT}}
+          dangerouslySetInnerHTML={{__html: OPENAI_ADS_BOOTSTRAP}}
         />
-        <script nonce={nonce} async src={OPENAI_ADS_SDK} />
+        <script nonce={nonce} async src={OPENAI_SDK_URL} />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
@@ -221,6 +229,7 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
+      <OpenAiAdsPixel />
       <PageLayout {...data}>
         <Outlet />
       </PageLayout>

@@ -244,4 +244,14 @@ export default [
       'react-hooks/rules-of-hooks': 'off',
     },
   },
+  {
+    // Tests run on Vitest, not Jest. eslint-plugin-jest's
+    // `no-deprecated-functions` rule calls detectJestVersion() and throws
+    // outright when Jest isn't installed, so it is turned off for test files
+    // only — every other rule still applies to them.
+    files: ['**/*.test.ts', '**/*.test.tsx'],
+    rules: {
+      'jest/no-deprecated-functions': 'off',
+    },
+  },
 ];

@@ -1,4 +1,5 @@
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
+import {useCheckoutStartedPublisher} from '~/components/OpenAiAdsPixel';
 import type {CartLayout} from '~/components/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useEffect, useId, useRef, useState} from 'react';
@@ -41,17 +42,31 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
         giftCardHeadingId={giftCardHeadingId}
         giftCardInputId={giftCardInputId}
       />
-      <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
+      <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} cart={cart} />
     </div>
   );
 }
 
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
+function CartCheckoutActions({
+  checkoutUrl,
+  cart,
+}: {
+  checkoutUrl?: string;
+  cart?: OptimisticCart<CartApiQueryFragment | null>;
+}) {
+  const publishCheckoutStarted = useCheckoutStartedPublisher(cart ?? null);
+
   if (!checkoutUrl) return null;
 
   return (
     <div>
-      <a href={checkoutUrl} target="_self">
+      <a
+        href={checkoutUrl}
+        target="_self"
+        // Fired on the real checkout hand-off, not on cart open, so
+        // checkout_started reflects shoppers who actually left for checkout.
+        onClick={publishCheckoutStarted}
+      >
         <p>Continue to Checkout &rarr;</p>
       </a>
       <br />

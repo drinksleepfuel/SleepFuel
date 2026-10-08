@@ -3,6 +3,7 @@ import {Await, Link, NavLink} from 'react-router';
 import {Money, useOptimisticCart} from '@shopify/hydrogen';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {useCheckoutStartedPublisher} from '~/components/OpenAiAdsPixel';
 import {NAV_LINKS} from '~/components/Header';
 import logoUrl from '~/assets/logo.png';
 
@@ -122,6 +123,7 @@ function MobileCartBlock({
   onViewBag: () => void;
 }) {
   const cart = useOptimisticCart(original);
+  const publishCheckoutStarted = useCheckoutStartedPublisher(cart);
   const count = cart?.totalQuantity ?? 0;
 
   return (
@@ -150,6 +152,7 @@ function MobileCartBlock({
           {cart?.checkoutUrl && (
             <a
               href={cart.checkoutUrl}
+              onClick={publishCheckoutStarted}
               className="flex-1 rounded-full bg-white py-3 text-center text-sm font-semibold text-[color:var(--color-ink)] hover:bg-white/90"
             >
               Checkout

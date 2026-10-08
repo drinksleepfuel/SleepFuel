@@ -9,6 +9,7 @@ import {
 } from '@shopify/hydrogen';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {useCheckoutStartedPublisher} from '~/components/OpenAiAdsPixel';
 import {
   FREE_SHIPPING_THRESHOLD,
   MERCHANDISE_TO_SELLING_PLAN,
@@ -68,6 +69,7 @@ function CartDrawerBody({
   onClose: () => void;
 }) {
   const cart = useOptimisticCart(original);
+  const publishCheckoutStarted = useCheckoutStartedPublisher(cart);
   const lines = (cart?.lines?.nodes ?? []) as DrawerLine[];
   const count = cart?.totalQuantity ?? 0;
   const hasItems = count > 0;
@@ -106,7 +108,11 @@ function CartDrawerBody({
               Shipping &amp; taxes calculated at checkout.
             </p>
             {cart?.checkoutUrl && (
-              <a href={cart.checkoutUrl} className="btn-blue w-full text-base">
+              <a
+                href={cart.checkoutUrl}
+                onClick={publishCheckoutStarted}
+                className="btn-blue w-full text-base"
+              >
                 Continue to Checkout
               </a>
             )}

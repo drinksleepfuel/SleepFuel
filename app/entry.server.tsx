@@ -26,6 +26,16 @@ export default async function handleRequest(
   // Added to directives that already exist — naming a new one (e.g.
   // scriptSrc) would cancel the default-src fallback everything else relies
   // on.
+  // Exactly the sources the provider documents, nothing wider:
+  //   script-src  bzrcdn.openai.com   (SDK)
+  //   connect-src bzr.openai.com      (events via fetch/sendBeacon)
+  //   connect-src bzrcdn.openai.com   (pixel config)
+  //   img-src     bzr.openai.com      (image-request fallback)
+  //
+  // Script and image sources go on defaultSrc rather than new scriptSrc /
+  // imgSrc directives: this policy has neither, so everything falls back to
+  // default-src, and naming one would cancel that fallback for the whole
+  // page. The inline bootstrap uses the existing nonce — no unsafe-inline.
   const openAiAdsCsp = {
     defaultSrc: ['https://bzrcdn.openai.com', 'https://bzr.openai.com'],
     connectSrc: ['https://bzrcdn.openai.com', 'https://bzr.openai.com'],
