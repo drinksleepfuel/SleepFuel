@@ -19,11 +19,11 @@ declare global {
 }
 
 /** How often, and for how long, to wait for the privacy API to load. */
-const CONSENT_POLL_INTERVAL_MS = 200;
-const CONSENT_POLL_TIMEOUT_MS = 10_000;
+export const CONSENT_POLL_INTERVAL_MS = 200;
+export const CONSENT_POLL_TIMEOUT_MS = 10_000;
 
 /** Payload Shopify attaches to `visitorConsentCollected`. */
-type VisitorConsentDetail = {
+export type VisitorConsentDetail = {
   analyticsAllowed?: boolean;
   marketingAllowed?: boolean;
 };
@@ -44,7 +44,7 @@ type VisitorConsentDetail = {
  * Returns null when consent cannot be determined, leaving the caller to fall
  * back to Hydrogen.
  */
-function readTrackingConsent(detail?: VisitorConsentDetail): boolean | null {
+export function readTrackingConsent(detail?: VisitorConsentDetail): boolean | null {
   if (
     typeof detail?.analyticsAllowed === 'boolean' &&
     typeof detail?.marketingAllowed === 'boolean'

@@ -41,12 +41,21 @@ export default async function handleRequest(
     connectSrc: ['https://bzrcdn.openai.com', 'https://bzr.openai.com'],
   };
 
+  // Meta pixel. fbevents.js and its per-pixel config load from
+  // connect.facebook.net; events go to www.facebook.com/tr by fetch/beacon,
+  // with an image request as fallback. Same rule as above: script and image
+  // sources ride on defaultSrc, never new scriptSrc / imgSrc directives.
+  const metaPixelCsp = {
+    defaultSrc: ['https://connect.facebook.net', 'https://www.facebook.com'],
+    connectSrc: ['https://connect.facebook.net', 'https://www.facebook.com'],
+  };
+
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
     shop: {
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
-    ...mergeCsp(openAiAdsCsp, getWeaverseCsp(request, context)),
+    ...mergeCsp(openAiAdsCsp, metaPixelCsp, getWeaverseCsp(request, context)),
   });
 
   const body = await renderToReadableStream(
