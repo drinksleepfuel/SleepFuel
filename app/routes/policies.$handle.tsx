@@ -1,4 +1,6 @@
-import {Link, useLoaderData} from 'react-router';
+import {useLoaderData} from 'react-router';
+import {LegalDocument} from '~/components/LegalDocument';
+import {formatLegalHtml} from '~/lib/legalHtml';
 import type {Route} from './+types/policies.$handle';
 import {type Shop} from '@shopify/hydrogen/storefront-api-types';
 
@@ -50,16 +52,12 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policy">
-      <br />
-      <br />
-      <div>
-        <Link to="/policies">← Back to Policies</Link>
-      </div>
-      <br />
-      <h1>{policy.title}</h1>
-      <div dangerouslySetInnerHTML={{__html: policy.body}} />
-    </div>
+    <LegalDocument
+      eyebrow="Legal"
+      title={policy.title}
+      html={formatLegalHtml(policy.body, policy.title)}
+      backLink={{to: '/policies', label: 'All policies'}}
+    />
   );
 }
 
