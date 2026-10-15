@@ -4,11 +4,15 @@ import {type Shop} from '@shopify/hydrogen/storefront-api-types';
 
 type SelectedPolicies = keyof Pick<
   Shop,
-  'privacyPolicy' | 'shippingPolicy' | 'termsOfService' | 'refundPolicy'
+  | 'privacyPolicy'
+  | 'shippingPolicy'
+  | 'termsOfService'
+  | 'refundPolicy'
+  | 'subscriptionPolicy'
 >;
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.policy.title ?? ''}`}];
+  return [{title: `${data?.policy.title ?? 'Policy'} | SleepFuel`}];
 };
 
 export async function loader({params, context}: Route.LoaderArgs) {
@@ -27,6 +31,7 @@ export async function loader({params, context}: Route.LoaderArgs) {
       shippingPolicy: false,
       termsOfService: false,
       refundPolicy: false,
+      subscriptionPolicy: false,
       [policyName]: true,
       language: context.storefront.i18n?.language,
     },
@@ -74,6 +79,7 @@ const POLICY_CONTENT_QUERY = `#graphql
     $refundPolicy: Boolean!
     $shippingPolicy: Boolean!
     $termsOfService: Boolean!
+    $subscriptionPolicy: Boolean!
   ) @inContext(language: $language, country: $country) {
     shop {
       privacyPolicy @include(if: $privacyPolicy) {
@@ -87,6 +93,14 @@ const POLICY_CONTENT_QUERY = `#graphql
       }
       refundPolicy @include(if: $refundPolicy) {
         ...Policy
+      }
+      # Shopify's "Purchase options cancellation policy" (Subscribe & Save).
+      subscriptionPolicy @include(if: $subscriptionPolicy) {
+        body
+        handle
+        id
+        title
+        url
       }
     }
   }

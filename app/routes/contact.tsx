@@ -51,15 +51,32 @@ export default function Contact() {
         </Section>
 
         <Section title="Returns">
+          <List
+            items={[
+              'Return any unopened, unused package within 30 days of delivery for a full refund of the product price.',
+              'For health and safety reasons, we can’t accept opened boxes or individual stick packs.',
+              'Return shipping is paid by the customer, and original shipping charges are not refundable.',
+              'If your order arrives damaged, defective, or wrong, we’ll replace it or refund you in full, shipping included. No need to send it back.',
+              'Approved refunds go back to your original payment method within 5 to 10 business days.',
+            ]}
+          />
           <P>
-            If something is not right with your order, email{' '}
+            To start a return, email{' '}
             <a
               href={`mailto:${CONTACT_EMAIL}`}
               className="underline hover:text-[color:var(--color-blue)]"
             >
               {CONTACT_EMAIL}
             </a>{' '}
-            and we will sort it out with you.
+            with your order number before sending anything back. For damaged or
+            wrong items, include a photo. Read the full{' '}
+            <a
+              href="/policies/refund-policy"
+              className="underline hover:text-[color:var(--color-blue)]"
+            >
+              refund policy
+            </a>
+            .
           </P>
         </Section>
 

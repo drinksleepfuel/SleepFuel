@@ -45,6 +45,21 @@ const FOOTER_COLUMNS: FooterColumn[] = [
   },
 ];
 
+/**
+ * Legal pages, always shown in the footer's bottom bar. Kept in code rather
+ * than Weaverse theme settings so they cannot be removed by accident.
+ * Policy pages come from Shopify (Settings > Policies); the legal notice is a
+ * Shopify page with the handle `legal-notice`.
+ */
+const LEGAL_LINKS: FooterLink[] = [
+  {label: 'Privacy Policy', to: '/privacy-policy'},
+  {label: 'Terms of Service', to: '/policies/terms-of-service'},
+  {label: 'Refund Policy', to: '/policies/refund-policy'},
+  {label: 'Shipping Policy', to: '/policies/shipping-policy'},
+  {label: 'Subscription Policy', to: '/policies/subscription-policy'},
+  {label: 'Legal Notice', to: '/pages/legal-notice'},
+];
+
 const FDA_DISCLAIMER = `* These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure or prevent any disease.
 Information on this site is provided for informational purposes only. It is not meant to substitute for medical advice from your physician or other medical professional. You should not use the information contained herein for diagnosing or treating a health problem or disease, or prescribing any medication. Carefully read all product documentation. If you have or suspect that you have a medical problem, promptly contact your regular health care provider.`;
 
@@ -150,7 +165,22 @@ export function Footer(_props: FooterProps) {
         {/* Disclaimer */}
         <div className="pt-8 text-xs leading-relaxed text-white/45">
           <p className="whitespace-pre-line">{disclaimer}</p>
-          <p className="mt-6">
+          <nav aria-label="Legal" className="mt-6">
+            <ul className="flex flex-wrap gap-x-5 gap-y-2">
+              {LEGAL_LINKS.map((link) => (
+                <li key={link.to}>
+                  <NavLink
+                    to={link.to}
+                    prefetch="intent"
+                    className="underline-offset-2 hover:text-white/80 hover:underline"
+                  >
+                    {link.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <p className="mt-4">
             © {new Date().getFullYear()} SleepFuel. All rights reserved.
           </p>
         </div>
