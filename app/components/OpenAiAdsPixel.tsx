@@ -10,6 +10,7 @@ import {
   type OaiqContentsEvent,
   type OaiqStorefrontEvent,
 } from '~/lib/openAiPixel';
+import {readCookie, sanitizeRef} from '~/lib/openAiCapi';
 
 declare global {
   interface Window {
@@ -63,6 +64,75 @@ export function readTrackingConsent(detail?: VisitorConsentDetail): boolean | nu
     // The API throws until it has loaded; treat that as "not yet known".
     return null;
   }
+}
+
+/** Where the cart attribution endpoint lives; see api.ad-attribution.ts. */
+const ATTRIBUTION_ENDPOINT = '/api/ad-attribution';
+/** Last refs sent this session, so each change is posted only once. */
+const ATTRIBUTION_SENT_KEY = 'oaiq_attribution_sent';
+
+function rememberedAttribution(): string | null {
+  try {
+    return window.sessionStorage.getItem(ATTRIBUTION_SENT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function rememberAttribution(value: string | null) {
+  try {
+    if (value === null) window.sessionStorage.removeItem(ATTRIBUTION_SENT_KEY);
+    else window.sessionStorage.setItem(ATTRIBUTION_SENT_KEY, value);
+  } catch {
+    // Storage blocked: the worst case is posting the same refs again.
+  }
+}
+
+/**
+ * Copies the pixel's `__oppref` / `__obref` cookies onto the cart, so the
+ * order webhook can attribute the purchase to the ad click. Uses sendBeacon
+ * so it still goes out when called as the shopper leaves for checkout.
+ */
+function postAttribution(payload: Record<string, unknown>) {
+  const body = JSON.stringify(payload);
+  try {
+    if (
+      navigator.sendBeacon?.(
+        ATTRIBUTION_ENDPOINT,
+        new Blob([body], {type: 'application/json'}),
+      )
+    ) {
+      return;
+    }
+  } catch {
+    // Fall through to fetch.
+  }
+  void fetch(ATTRIBUTION_ENDPOINT, {
+    method: 'POST',
+    body,
+    keepalive: true,
+    credentials: 'same-origin',
+    headers: {'Content-Type': 'application/json'},
+  }).catch(() => {});
+}
+
+function syncAttributionToCart(allowed: boolean) {
+  const previous = rememberedAttribution();
+  if (!allowed) {
+    // Consent withdrawn after refs were stored: take them back off the cart.
+    if (previous) {
+      postAttribution({clear: true});
+      rememberAttribution(null);
+    }
+    return;
+  }
+  const oppref = sanitizeRef(readCookie(document.cookie, '__oppref'));
+  const obref = sanitizeRef(readCookie(document.cookie, '__obref'));
+  if (!oppref && !obref) return;
+  const key = `${oppref ?? ''}|${obref ?? ''}`;
+  if (key === previous) return;
+  postAttribution({oppref, obref});
+  rememberAttribution(key);
 }
 
 /** Hydrogen requires custom analytics event names to start with `custom_`. */
@@ -135,7 +205,11 @@ export function OpenAiAdsPixel() {
   // denied and only opens once Shopify's customer privacy API resolves.
   useEffect(() => {
     const onConsentCollected = (event: Event) => {
-      syncConsent((event as CustomEvent<VisitorConsentDetail>).detail);
+      const allowed = syncConsent(
+        (event as CustomEvent<VisitorConsentDetail>).detail,
+      );
+      // A withdrawal also removes any refs already copied onto the cart.
+      if (!allowed) syncAttributionToCart(false);
     };
 
     syncConsent();
@@ -182,17 +256,20 @@ export function OpenAiAdsPixel() {
     // never sent for a failed add.
     subscribe('product_added_to_cart', (payload) => {
       measure('items_added', mapAddedToCart(payload as never));
+      // The cart exists now, so the attribution refs have somewhere to go.
+      syncAttributionToCart(syncConsent());
     });
 
     subscribe(CHECKOUT_STARTED_EVENT, (payload) => {
       const {cart, shop} = (payload ?? {}) as CheckoutStartedPayload;
       measure('checkout_started', mapCheckoutStarted(cart, shop ?? null));
+      syncAttributionToCart(syncConsent());
     });
 
     // Tells the analytics provider this subscriber is attached, so events
     // buffered during startup are flushed rather than lost.
     ready();
-  }, [subscribe, ready, measure]);
+  }, [subscribe, ready, measure, syncConsent]);
 
   return null;
 }
