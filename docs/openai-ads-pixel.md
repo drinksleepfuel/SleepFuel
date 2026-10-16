@@ -207,3 +207,40 @@ Object.defineProperty(window, 'oaiq', {configurable: true, get: () => current, s
 
 The accessor matters: the SDK replaces `window.oaiq` when it finishes loading,
 so a plain wrapper is silently discarded.
+
+## Purchases: server side via the Conversions API (October 2026)
+
+This replaces the custom pixel plan above. A Shopify custom pixel runs in a
+sandboxed iframe that cannot read the storefront's `__oppref` cookie, so it
+could count purchases but not attribute them. Purchases are now reported from
+the server instead:
+
+| Step | Where |
+| --- | --- |
+| Pixel refs (`__oppref`, `__obref`) copied onto the cart as hidden attributes after add to cart and at checkout, only while consent allows | `OpenAiAdsPixel.tsx` -> `app/routes/api.ad-attribution.ts` |
+| Shopify carries cart attributes onto the order as `note_attributes` | Shopify |
+| `orders/create` webhook verified (HMAC) and sent to `https://bzr.openai.com/v1/events` as `order_created` | `app/routes/webhooks.orders-create.ts` |
+| Mapping, hashing, consent rules (unit tested) | `app/lib/openAiCapi.ts` |
+
+- Event id is `order_<Shopify order id>`, so Shopify retries never double count.
+- Value is the merchandise subtotal after discounts, in minor units; line
+  amounts are the per unit price actually charged.
+- With consent: `oppref`, `obref`, hashed email, phone, name and customer id,
+  plus city, region, postal code, country, IP and user agent.
+- Without consent: still reported (so totals are complete) with
+  `opt_out: true` and no refs or personal data.
+- Shopify test orders are sent with `validate_only: true`.
+
+### Setup (Shopify admin and OpenAI, not code)
+
+1. OpenAI Ads Manager > Conversions: create a Conversions API key (`sk-svc-...`).
+2. Shopify admin > Settings > Notifications > Webhooks: create webhook, event
+   **Order creation**, format **JSON**, URL
+   `https://drinksleepfuel.com/webhooks/orders-create`. Copy the signing
+   secret shown on that page.
+3. Shopify admin > Hydrogen > SleepFuel > Environments and variables >
+   Production: add `OPENAI_ADS_CAPI_KEY` (the key, marked secret) and
+   `SHOPIFY_WEBHOOK_SECRET` (the signing secret, marked secret). Redeploy.
+4. Verify: Shopify's "Send test notification" should return 2xx; then place a
+   real order after clicking through with `?oppref=test` and confirm it shows
+   in OpenAI Ads Manager.
