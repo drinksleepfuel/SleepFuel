@@ -1,9 +1,11 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {LegalDocument} from '~/components/LegalDocument';
+import {formatLegalHtml} from '~/lib/legalHtml';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
+  return [{title: `${data?.page.title ?? 'Page'} | SleepFuel`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -54,16 +56,21 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
 
+/** Shopify pages that hold legal text get the same "Legal" eyebrow as policies. */
+const LEGAL_PAGE_HANDLES: ReadonlySet<string> = new Set([
+  'legal-notice',
+  'accessibility',
+]);
+
 export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className="page">
-      <header>
-        <h1>{page.title}</h1>
-      </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
-    </div>
+    <LegalDocument
+      eyebrow={LEGAL_PAGE_HANDLES.has(page.handle) ? 'Legal' : undefined}
+      title={page.title}
+      html={formatLegalHtml(page.body, page.title)}
+    />
   );
 }
 

@@ -2,6 +2,10 @@ import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/policies._index';
 import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
 
+export const meta: Route.MetaFunction = () => [
+  {title: 'Policies | SleepFuel'},
+];
+
 export async function loader({context}: Route.LoaderArgs) {
   const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);
 
@@ -25,15 +29,40 @@ export default function Policies() {
   const {policies} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policies">
-      <h1>Policies</h1>
-      <div>
+    <div className="mx-auto max-w-3xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <p className="text-sm font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+        Legal
+      </p>
+      <h1
+        className="mt-2 text-[44px] font-normal leading-[1.05] tracking-tight sm:text-5xl"
+        style={{fontFamily: 'var(--font-display)'}}
+      >
+        Policies
+      </h1>
+      <ul className="mt-10 divide-y divide-[color:var(--color-border)] border-y border-[color:var(--color-border)]">
         {policies.map((policy) => (
-          <fieldset key={policy.id}>
-            <Link to={`/policies/${policy.handle}`}>{policy.title}</Link>
-          </fieldset>
+          <li key={policy.id}>
+            <Link
+              to={`/policies/${policy.handle}`}
+              prefetch="intent"
+              className="flex items-center justify-between py-5 text-lg text-[color:var(--color-ink)] hover:text-[color:var(--color-blue)]"
+            >
+              {policy.title}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </li>
         ))}
-      </div>
+        <li>
+          <Link
+            to="/pages/legal-notice"
+            prefetch="intent"
+            className="flex items-center justify-between py-5 text-lg text-[color:var(--color-ink)] hover:text-[color:var(--color-blue)]"
+          >
+            Legal Notice
+            <span aria-hidden="true">→</span>
+          </Link>
+        </li>
+      </ul>
     </div>
   );
 }
